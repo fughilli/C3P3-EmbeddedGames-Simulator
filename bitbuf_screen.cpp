@@ -390,9 +390,9 @@ void Screen::hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color)
 	else
 	{
 		l_mask = 0xff >> (x1 & 7);
-		x1 = x1 / 8 + m_width * line;
-		r_mask = ~(0xff >> (x2 & 7));
-		x2 = x2 / 8 + m_width * line;
+		x1 = (x1 + m_width * line) / 8;
+		r_mask = ~(0xff >> ((x2 & 7) + 1));
+		x2 = (x2 + m_width * line) / 8;
 		if (x1 == x2)
 		{
 			l_mask = l_mask & r_mask;
@@ -540,7 +540,7 @@ void Screen::box(const Rect_t * _box, Color_t color, Color_t fcolor)
 {
 	if (_box != NULL)
 	{
-		box(_box->x, _box->y, _box->x + _box->w, _box->y + _box->h, color, fcolor);
+		box(_box->x, _box->y, _box->x + _box->w - 1, _box->y + _box->h - 1, color, fcolor);
 	}
 }
 
