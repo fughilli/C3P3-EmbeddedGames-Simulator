@@ -5,12 +5,14 @@
  *      Author: Kevin
  */
 
-#include "bitbuf_screen.h"
+#include "screen.h"
+#include "tvout.h"
+#include <algorithm>
 
 // For NULL:
 #include <stdlib.h>
 
-Screen::Screen(uint8_t* _fbuf, int32_t _w, int32_t _h)
+Screen::Screen(uint8_t** _fbuf, int32_t _w, int32_t _h)
 {
     framebuffer = _fbuf;
     m_width = _w;
@@ -24,14 +26,14 @@ void Screen::clear(Color_t color)
 	{
 		for (; i < (m_width * m_height / 8); i++)
 		{
-			framebuffer[i] = ((color == BLACK) ? (0x00) : (0xFF));
+            (*framebuffer)[i] = ((color == BLACK) ? (0x00) : (0xFF));
 		}
 	}
 	else
 	{
 		for (; i < (m_width * m_height / 8); i++)
 		{
-			framebuffer[i] = ~framebuffer[i];
+            (*framebuffer)[i] = ~(*framebuffer)[i];
 		}
 	}
 }
@@ -42,13 +44,13 @@ void Screen::setPixel_nbx(int32_t x, int32_t y, Color_t color)
 	switch (color)
 	{
 	case BLACK:
-		framebuffer[(x / 8) + y * (m_width / 8)] &= ~(0x80 >> (x % 8));
+        (*framebuffer)[(x / 8) + y * (m_width / 8)] &= ~(0x80 >> (x % 8));
 		break;
 	case WHITE:
-		framebuffer[(x / 8) + y * (m_width / 8)] |= (0x80 >> (x % 8));
+        (*framebuffer)[(x / 8) + y * (m_width / 8)] |= (0x80 >> (x % 8));
 		break;
 	case INVERT:
-		framebuffer[(x / 8) + y * (m_width / 8)] ^= (0x80 >> (x % 8));
+        (*framebuffer)[(x / 8) + y * (m_width / 8)] ^= (0x80 >> (x % 8));
 		break;
     default:
         return;
@@ -77,7 +79,7 @@ void Screen::bitmap(int32_t x, int32_t y, const uint8_t * _bitmap, int32_t w, in
 		Bitmap_mode_t mode)
 {
 	Rect_t src;
-	Point_t dest;
+    Rect_t dest;
 	Bitmap_t bmp;
 
 	dest.x = x;
@@ -99,7 +101,7 @@ void Screen::bitmap_nbx(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w,
 		Bitmap_mode_t mode)
 {
 	Rect_t src;
-	Point_t dest;
+    Rect_t dest;
 	Bitmap_t bmp;
 
 	dest.x = x;
@@ -117,12 +119,12 @@ void Screen::bitmap_nbx(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w,
 	bitmap_nbx(&bmp, &src, &dest, mode);
 }
 
-void Screen::bitmap_adj(const Bitmap_t * _bmp, const Rect_t * _srcRect, const Point_t * _dest,
+void Screen::bitmap_adj(const Bitmap_t * _bmp, const Rect_t * _srcRect, const Rect_t * _dest,
 		Bitmap_mode_t mode)
 {
     Bitmap_t bmp = *_bmp;
     Rect_t srcRect = *_srcRect;
-    Point_t dest = *_dest;
+    Rect_t dest = *_dest;
 
 	if (bmp.w <= 0 || bmp.h <= 0)
 	{
@@ -185,7 +187,7 @@ void Screen::bitmap_adj(const Bitmap_t * _bmp, const Rect_t * _srcRect, const Po
 	bitmap_nbx(&bmp, &srcRect, &dest, mode);
 }
 
-void Screen::bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest,
+void Screen::bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest,
 		Bitmap_mode_t mode)
 {
 	// If this condition is satisfied, nothing needs to happen...
@@ -218,7 +220,7 @@ void Screen::bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t 
 	bitmap_nbx(bmp, srcRect, dest, mode);
 }
 
-void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest,
+void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest,
 		Bitmap_mode_t mode)
 {
 	// How wide is the bitmap in bytes?
@@ -306,72 +308,72 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Poin
 			case MODE_OVERWRITE_INVERT:
 				if (bmpColByteIndex == 0)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex]
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex]
 							& dest_lEdgeMask) | (stagingArea & ~dest_lEdgeMask);
 				}
 				else if (bmpColByteIndex == numDestCols - 1)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex]
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex]
 							& dest_rEdgeMask) | (stagingArea & ~dest_rEdgeMask);
 				}
 				else
 				{
-					framebuffer[destIndex] = (stagingArea & 0xFF);
+                    (*framebuffer)[destIndex] = (stagingArea & 0xFF);
 				}
 				break;
 			case MODE_BLEND:
 			case MODE_BLEND_INVERT:
 				if (bmpColByteIndex == 0)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex])
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex])
 							| (stagingArea & ~dest_lEdgeMask);
 				}
 				else if (bmpColByteIndex == numDestCols - 1)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex])
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex])
 							| (stagingArea & ~dest_rEdgeMask);
 				}
 				else
 				{
-					framebuffer[destIndex] |= (stagingArea & 0xFF);
+                    (*framebuffer)[destIndex] |= (stagingArea & 0xFF);
 				}
 				break;
 			case MODE_MASK:
 			case MODE_MASK_INVERT:
 				if (bmpColByteIndex == 0)
 				{
-					framebuffer[destIndex] =
-							(framebuffer[destIndex])
+                    (*framebuffer)[destIndex] =
+                        ((*framebuffer)[destIndex])
 									& ((stagingArea & ~dest_lEdgeMask)
 											| dest_lEdgeMask);
 				}
 				else if (bmpColByteIndex == numDestCols - 1)
 				{
-					framebuffer[destIndex] =
-							(framebuffer[destIndex])
+                    (*framebuffer)[destIndex] =
+                        ((*framebuffer)[destIndex])
 									& ((stagingArea & ~dest_rEdgeMask)
 											| dest_rEdgeMask);
 				}
 				else
 				{
-					framebuffer[destIndex] &= (stagingArea & 0xFF);
+                    (*framebuffer)[destIndex] &= (stagingArea & 0xFF);
 				}
 				break;
 			case MODE_INVERT:
 			case MODE_INVERT_INVERT:
 				if (bmpColByteIndex == 0)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex])
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex])
 							^ (stagingArea & ~dest_lEdgeMask);
 				}
 				else if (bmpColByteIndex == numDestCols - 1)
 				{
-					framebuffer[destIndex] = (framebuffer[destIndex])
+                    (*framebuffer)[destIndex] = ((*framebuffer)[destIndex])
 							^ (stagingArea & ~dest_rEdgeMask);
 				}
 				else
 				{
-					framebuffer[destIndex] ^= (stagingArea & 0xFF);
+                    (*framebuffer)[destIndex] ^= (stagingArea & 0xFF);
 				}
 				break;
 			}
@@ -406,23 +408,25 @@ void Screen::hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color)
 		switch (color)
 		{
 		case WHITE:
-			framebuffer[x1++] |= l_mask;
+            (*framebuffer)[x1++] |= l_mask;
 			while (x1 < x2)
-				framebuffer[x1++] = 0xff;
-			framebuffer[x1] |= r_mask;
+                (*framebuffer)[x1++] = 0xff;
+            (*framebuffer)[x1] |= r_mask;
 			break;
 		case BLACK:
-			framebuffer[x1++] &= ~l_mask;
+            (*framebuffer)[x1++] &= ~l_mask;
 			while (x1 < x2)
-				framebuffer[x1++] = 0;
-			framebuffer[x1] &= ~r_mask;
+                (*framebuffer)[x1++] = 0;
+            (*framebuffer)[x1] &= ~r_mask;
 			break;
 		case INVERT:
-			framebuffer[x1++] ^= l_mask;
+            (*framebuffer)[x1++] ^= l_mask;
 			while (x1 < x2)
-				framebuffer[x1++] ^= 0xff;
-			framebuffer[x1] ^= r_mask;
+                (*framebuffer)[x1++] ^= 0xff;
+            (*framebuffer)[x1] ^= r_mask;
 			break;
+        case NONE:
+            return;
 		}
 	}
 }
@@ -456,14 +460,16 @@ void Screen::vline_nbx(int32_t col, int32_t y1, int32_t y2, Color_t color)
 		switch (color)
 		{
 		case WHITE:
-			framebuffer[y1 * screenByteWidth + rowOffset] |= v_mask;
+            (*framebuffer)[y1 * screenByteWidth + rowOffset] |= v_mask;
 			break;
 		case BLACK:
-			framebuffer[y1 * screenByteWidth + rowOffset] &= ~v_mask;
+            (*framebuffer)[y1 * screenByteWidth + rowOffset] &= ~v_mask;
 			break;
 		case INVERT:
-			framebuffer[y1 * screenByteWidth + rowOffset] ^= v_mask;
+            (*framebuffer)[y1 * screenByteWidth + rowOffset] ^= v_mask;
 			break;
+        case NONE:
+            return;
 		}
 		y1++;
 	}
@@ -559,7 +565,7 @@ void Screen::circle_nbx(int32_t x, int32_t y, int32_t r, Color_t color,
 	uint8_t pyy = y0, pyx = x0;
 
 	//there is a fill color
-	if (fcolor != NULL)
+    if (fcolor != NONE)
 		hline_nbx(y, x - r, x + r, fcolor);
 
 	setPixel_nbx(x, y + r, color);
@@ -686,7 +692,7 @@ void DispMath::lerp(const Point_t * a, const Point_t * b, Point_t * x, float arg
 	x->y = a->y + ((b->y - a->y) * arg);
 }
 
-bool Screen::boundsCheck(Point_t* p)
+bool Screen::boundsCheck(const Point_t* p)
 {
 	return !(p->x < 0 || p->y < 0 || p->x >= m_width || p->y >= m_height);
 }
@@ -695,3 +701,56 @@ bool Screen::boundsCheck(int32_t x, int32_t y)
 {
 	return !(x < 0 || y < 0 || x >= m_width || y >= m_height);
 }
+
+bool Screen::boundsCheck(const Rect_t* r)
+{
+    return (boundsCheck(r->x, r->y) || boundsCheck(r->x + r->w, r->y + r->h));
+}
+
+void Screen::bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode)
+{
+    uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
+#define BMP_PIX(__x, __y) (((bmp->data[(bmp_byte_width * (__y)) + ((__x)/8)] << ((__x) % 8)) & 0x80) == 0x80)
+
+    for(uint32_t j = 0; j < destRect->h; j++)
+    {
+        for(uint32_t i = 0; i < destRect->w; i++)
+        {
+            uint8_t pixel = BMP_PIX(srcRect->x + ((i*srcRect->w)/destRect->w), srcRect->y + ((j*srcRect->h)/destRect->h));
+            //BMP_PIX(srcRect->x + i, srcRect->y + j);
+            switch(mode)
+            {
+            case MODE_BLEND:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? WHITE : NONE);
+                break;
+            case MODE_MASK:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : BLACK);
+                break;
+            case MODE_OVERWRITE:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? WHITE : BLACK);
+                break;
+            case MODE_INVERT:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? INVERT : NONE);
+                break;
+
+            case MODE_BLEND_INVERT:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : WHITE);
+                break;
+            case MODE_MASK_INVERT:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? BLACK : NONE);
+                break;
+            case MODE_OVERWRITE_INVERT:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? BLACK : WHITE);
+                break;
+            case MODE_INVERT_INVERT:
+                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : INVERT);
+                break;
+            }
+
+        }
+    }
+
+#undef BMP_PIX
+}
+
+Screen screen(&TVOut_Framebuffer, FB_WIDTH, FB_HEIGHT);

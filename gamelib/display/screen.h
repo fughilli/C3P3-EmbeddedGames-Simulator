@@ -57,9 +57,9 @@ protected:
     int32_t m_width;
     int32_t m_height;
 
-    uint8_t* framebuffer;
+    uint8_t** framebuffer;
 public:
-    Screen(uint8_t* _fbuf, int32_t _w, int32_t _h);
+    Screen(uint8_t** _fbuf, int32_t _w, int32_t _h);
 	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
 	void setPixel(int32_t x, int32_t y, Color_t color);
 	void clear(Color_t color);
@@ -68,9 +68,11 @@ public:
 
 	void bitmap(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
 	void bitmap_nbx(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
-	void bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, Bitmap_mode_t mode);
-	void bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, Bitmap_mode_t mode);
-	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, Bitmap_mode_t mode);
+	void bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
+	void bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
+	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
+
+	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
 
 	void hline(int32_t line, int32_t x1, int32_t x2, Color_t color);
 	void hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color);
@@ -85,13 +87,16 @@ public:
 	void circle_nbx(int32_t x, int32_t y, int32_t r, Color_t color, Color_t fcolor);
 	void circle(const Point_t * pos, int32_t r, Color_t color, Color_t fcolor);
 
-	bool boundsCheck(Point_t* p);
+	bool boundsCheck(const Point_t* p);
 	bool boundsCheck(int32_t x, int32_t y);
+	bool boundsCheck(const Rect_t* r);
 };
 
 class DispMath {
 public:
     static void lerp(const Point_t * a, const Point_t * b, Point_t * x, float arg);
 };
+
+extern Screen screen;
 
 #endif /* SCREEN_H_ */
