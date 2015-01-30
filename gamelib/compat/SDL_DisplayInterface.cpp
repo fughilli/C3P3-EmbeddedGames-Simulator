@@ -1,6 +1,7 @@
 #include "SDL_DisplayInterface.h"
 #include "SDL2/SDL.h"
 
+
 static uint32_t G3D_ColorTo32BitColor(const G3D_Color& color)
 {
     uint32_t ret = color.r;
