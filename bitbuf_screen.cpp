@@ -385,6 +385,11 @@ void Screen::hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color)
 {
 	uint8_t l_mask, r_mask;
 
+	if(x1 < 0)
+        x1 = 0;
+    if(x2 >= m_width)
+        x2 = m_width - 1;
+
 	if (x1 == x2)
 		setPixel_nbx(x1, line, color);
 	else
@@ -432,8 +437,7 @@ void Screen::hline(int32_t line, int32_t x1, int32_t x2, Color_t color)
 		x2 = temp;
 	}
 
-	if (x2 > m_width || x1 < 0 || color == NONE || line < 0
-			|| line >= m_height)
+	if (x1 >= m_width || x2 < 0 || line < 0 || line >= m_height)
 		return;
 
 	hline_nbx(line, x1, x2, color);
