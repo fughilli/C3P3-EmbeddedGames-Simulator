@@ -15,6 +15,10 @@
 Screen::Screen(uint8_t** _fbuf, int32_t _w, int32_t _h)
 {
     framebuffer = _fbuf;
+
+    if(m_width % 8)
+        m_width = (((m_width / 8) + 1)*8);
+
     m_width = _w;
     m_height = _h;
 }
@@ -36,6 +40,19 @@ void Screen::clear(Color_t color)
             (*framebuffer)[i] = ~(*framebuffer)[i];
         }
     }
+}
+
+bool Screen::getPixel_nbx(int32_t x, int32_t y)
+{
+    return (((*framebuffer)[(x / 8) + y * (m_width / 8)] & (0x80 >> (x % 8))) > 0);
+}
+
+bool Screen::getPixel(int32_t x, int32_t y)
+{
+    if (x < 0 || x >= m_width || y < 0 || y >= m_height)
+        return false;
+
+    return getPixel_nbx(x, y);
 }
 
 void Screen::setPixel_nbx(int32_t x, int32_t y, Color_t color)
@@ -692,25 +709,26 @@ void DispMath::lerp(const Point_t * a, const Point_t * b, Point_t * x, float arg
     x->y = a->y + ((b->y - a->y) * arg);
 }
 
-bool Screen::boundsCheck(const Point_t* p)
+bool Screen::bx(const Point_t* p)
 {
     return !(p->x < 0 || p->y < 0 || p->x >= m_width || p->y >= m_height);
 }
 
-bool Screen::boundsCheck(int32_t x, int32_t y)
+bool Screen::bx(int32_t x, int32_t y)
 {
     return !(x < 0 || y < 0 || x >= m_width || y >= m_height);
 }
 
-bool Screen::boundsCheck(const Rect_t* r)
+bool Screen::bx(const Rect_t* r)
 {
-    return (boundsCheck(r->x, r->y) || boundsCheck(r->x + r->w, r->y + r->h));
+    return (bx(r->x, r->y) || bx(r->x + r->w, r->y + r->h));
 }
+
+#define BMP_PIX(__x, __y) (((bmp->data[(bmp_byte_width * (__y)) + ((__x)/8)] << ((__x) % 8)) & 0x80) == 0x80)
 
 void Screen::bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode)
 {
     uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
-#define BMP_PIX(__x, __y) (((bmp->data[(bmp_byte_width * (__y)) + ((__x)/8)] << ((__x) % 8)) & 0x80) == 0x80)
 
     for(uint32_t j = 0; j < destRect->h; j++)
     {
@@ -746,11 +764,58 @@ void Screen::bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, con
                 setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : INVERT);
                 break;
             }
-
         }
     }
+}
+
+void bitmap_affine_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, const Point_t * v1, const Point_t * v2, Bitmap_mode_t mode)
+{
+//    uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
+//
+//    for(uint32_t j = 0; j < destRect->h; j++)
+//    {
+//        for(uint32_t i = 0; i < destRect->w; i++)
+//        {
+//            uint8_t pixel = BMP_PIX(srcRect->x + ((i*srcRect->w)/destRect->w), srcRect->y + ((j*srcRect->h)/destRect->h));
+//            //BMP_PIX(srcRect->x + i, srcRect->y + j);
+//            switch(mode)
+//            {
+//            case MODE_BLEND:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? WHITE : NONE);
+//                break;
+//            case MODE_MASK:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : BLACK);
+//                break;
+//            case MODE_OVERWRITE:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? WHITE : BLACK);
+//                break;
+//            case MODE_INVERT:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? INVERT : NONE);
+//                break;
+//
+//            case MODE_BLEND_INVERT:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : WHITE);
+//                break;
+//            case MODE_MASK_INVERT:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? BLACK : NONE);
+//                break;
+//            case MODE_OVERWRITE_INVERT:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? BLACK : WHITE);
+//                break;
+//            case MODE_INVERT_INVERT:
+//                setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : INVERT);
+//                break;
+//            }
+//
+//        }
+//    }
+}
 
 #undef BMP_PIX
+
+void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode)
+{
+
 }
 
 Screen screen(&TVOut_Framebuffer, FB_WIDTH, FB_HEIGHT);

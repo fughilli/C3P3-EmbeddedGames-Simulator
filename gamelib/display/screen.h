@@ -60,36 +60,53 @@ protected:
     uint8_t** framebuffer;
 public:
     Screen(uint8_t** _fbuf, int32_t _w, int32_t _h);
-	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
-	void setPixel(int32_t x, int32_t y, Color_t color);
-	void clear(Color_t color);
+
+    // Raster dims
 	uint32_t getWidth();
 	uint32_t getHeight();
 
+    // Pixel access
+	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
+	void setPixel(int32_t x, int32_t y, Color_t color);
+
+	bool getPixel_nbx(int32_t x, int32_t y);
+	bool getPixel(int32_t x, int32_t y);
+
+	// Clear
+	void clear(Color_t color);
+
+    // Blits
 	void bitmap(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
 	void bitmap_nbx(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
 	void bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 
+    // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
+	void bitmap_affine_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, const Point_t * v1, const Point_t * v2, Bitmap_mode_t mode);
+	void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode);
 
+    // Lines
 	void hline(int32_t line, int32_t x1, int32_t x2, Color_t color);
 	void hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color);
 	void vline(int32_t col, int32_t y1, int32_t y2, Color_t color);
 	void vline_nbx(int32_t col, int32_t y1, int32_t y2, Color_t color);
 
+    // Boxes
 	void box(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color, Color_t fcolor);
 	void box_nbx(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color, Color_t fcolor);
 	void box(const Rect_t * box, Color_t color, Color_t fcolor);
 
+    // Circles
 	void circle(int32_t x, int32_t y, int32_t r, Color_t color, Color_t fcolor);
 	void circle_nbx(int32_t x, int32_t y, int32_t r, Color_t color, Color_t fcolor);
 	void circle(const Point_t * pos, int32_t r, Color_t color, Color_t fcolor);
 
-	bool boundsCheck(const Point_t* p);
-	bool boundsCheck(int32_t x, int32_t y);
-	bool boundsCheck(const Rect_t* r);
+    // Bounds check
+	bool bx(const Point_t* p);
+	bool bx(int32_t x, int32_t y);
+	bool bx(const Rect_t* r);
 };
 
 class DispMath {

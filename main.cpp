@@ -6,6 +6,7 @@
 #include "bitmaps/littleman_fixed.h"
 #include "gamelib/compat/compat_main.h"
 #include "gamelib/display/tvout.h"
+#include "game/game.h"
 
 SDL_DisplayInterface* compat_disp_interface;
 
