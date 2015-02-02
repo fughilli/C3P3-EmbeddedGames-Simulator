@@ -62,15 +62,19 @@ public:
     Screen(uint8_t** _fbuf, int32_t _w, int32_t _h);
 
     // Raster dims
-	uint32_t getWidth();
-	uint32_t getHeight();
+	uint32_t getWidth() const;
+	uint32_t getHeight() const;
 
     // Pixel access
 	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
 	void setPixel(int32_t x, int32_t y, Color_t color);
+	void setPixel_nbx(const Point_t* p, Color_t color);
+	void setPixel(const Point_t* p, Color_t color);
 
-	bool getPixel_nbx(int32_t x, int32_t y);
-	bool getPixel(int32_t x, int32_t y);
+	Color_t getPixel_nbx(int32_t x, int32_t y) const;
+	Color_t getPixel(int32_t x, int32_t y) const;
+	Color_t getPixel_nbx(const Point_t* p) const;
+	Color_t getPixel(const Point_t* p) const;
 
 	// Clear
 	void clear(Color_t color);
@@ -84,6 +88,7 @@ public:
 
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
+	void bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
 	void bitmap_affine_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, const Point_t * v1, const Point_t * v2, Bitmap_mode_t mode);
 	void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode);
 
@@ -92,6 +97,9 @@ public:
 	void hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color);
 	void vline(int32_t col, int32_t y1, int32_t y2, Color_t color);
 	void vline_nbx(int32_t col, int32_t y1, int32_t y2, Color_t color);
+
+	void line(const Point_t* p1, const Point_t* p2, Color_t color);
+	void line_nbx(const Point_t* p1, const Point_t* p2, Color_t color);
 
     // Boxes
 	void box(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color, Color_t fcolor);
@@ -104,9 +112,9 @@ public:
 	void circle(const Point_t * pos, int32_t r, Color_t color, Color_t fcolor);
 
     // Bounds check
-	bool bx(const Point_t* p);
-	bool bx(int32_t x, int32_t y);
-	bool bx(const Rect_t* r);
+	bool bx(const Point_t* p) const;
+	bool bx(int32_t x, int32_t y) const;
+	bool bx(const Rect_t* r) const;
 };
 
 class DispMath {

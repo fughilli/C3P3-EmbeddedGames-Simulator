@@ -42,15 +42,15 @@ void Screen::clear(Color_t color)
     }
 }
 
-bool Screen::getPixel_nbx(int32_t x, int32_t y)
+Color_t Screen::getPixel_nbx(int32_t x, int32_t y) const
 {
-    return (((*framebuffer)[(x / 8) + y * (m_width / 8)] & (0x80 >> (x % 8))) > 0);
+    return (((*framebuffer)[(x / 8) + y * (m_width / 8)] & (0x80 >> (x % 8))) ? (WHITE) : (BLACK));
 }
 
-bool Screen::getPixel(int32_t x, int32_t y)
+Color_t Screen::getPixel(int32_t x, int32_t y) const
 {
     if (x < 0 || x >= m_width || y < 0 || y >= m_height)
-        return false;
+        return NONE;
 
     return getPixel_nbx(x, y);
 }
@@ -82,12 +82,33 @@ void Screen::setPixel(int32_t x, int32_t y, Color_t color)
     setPixel_nbx(x, y, color);
 }
 
-uint32_t Screen::getWidth()
+void Screen::setPixel_nbx(const Point_t* p, Color_t color)
+{
+    setPixel_nbx(p->x, p->y, color);
+}
+
+void Screen::setPixel(const Point_t* p, Color_t color)
+{
+    setPixel(p->x, p->y, color);
+}
+
+Color_t Screen::getPixel_nbx(const Point_t* p) const
+{
+    return getPixel_nbx(p->x, p->y);
+}
+
+Color_t Screen::getPixel(const Point_t* p) const
+{
+    return getPixel(p->x, p->y);
+}
+
+
+uint32_t Screen::getWidth() const
 {
     return m_width;
 }
 
-uint32_t Screen::getHeight()
+uint32_t Screen::getHeight() const
 {
     return m_height;
 }
@@ -508,6 +529,85 @@ void Screen::vline(int32_t col, int32_t y1, int32_t y2, Color_t color)
     vline_nbx(col, y1, y2, color);
 }
 
+void Screen::line(const Point_t* p1, const Point_t* p2, Color_t color)
+{
+    if(!(bx(p1) && bx(p2)))
+        return;
+
+    line_nbx(p1, p2, color);
+}
+
+void Screen::line_nbx(const Point_t* p1, const Point_t* p2, Color_t color)
+{
+    if ((p1->x == p2->x) && (p1->y == p2->y))
+    {
+        setPixel_nbx(p1, color);
+    }
+    else if (p1->x == p2->x)
+    {
+        vline_nbx(p1->x, p1->y, p2->y, color);
+    }
+    else if (p1->y == p2->y)
+    {
+        hline_nbx(p1->y, p1->x, p2->x, color);
+    }
+    else
+    {
+        int32_t wx_1 = p1->x;
+        int32_t wx_2 = p2->x;
+        int32_t wy_1 = p1->y;
+        int32_t wy_2 = p2->y;
+
+        int32_t temp;
+
+        bool flag = abs(wy_2 - wy_1) > abs(wx_2 - wx_1);
+        if (flag)
+        {
+            temp = wx_1;
+            wx_1 = wy_1;
+            wy_1 = temp;
+
+            temp = wx_2;
+            wx_2 = wy_2;
+            wy_2 = temp;
+        }
+
+        if (wx_1 > wx_2)
+        {
+            temp = wx_1;
+            wx_1 = wx_2;
+            wx_2 = temp;
+
+            temp = wy_1;
+            wy_1 = wy_2;
+            wy_2 = temp;
+        }
+
+        int32_t dx = wx_2 - wx_1;
+        int32_t dy = abs(wy_2 - wy_1);
+        int32_t err = dx / 2;
+        int32_t ystep;
+
+        if (wy_1 < wy_2) ystep = 1;
+        else ystep = -1;
+
+        for (; wx_1<=wx_2; wx_1++)
+        {
+            if (flag)
+                setPixel_nbx(wy_1, wx_1, color);
+            else
+                setPixel_nbx(wx_1, wy_1, color);
+
+            err -= dy;
+            if (err < 0)
+            {
+                wy_1 += ystep;
+                err += dx;
+            }
+        }
+    }
+}
+
 void Screen::box(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color,
                  Color_t fcolor)
 {
@@ -709,17 +809,17 @@ void DispMath::lerp(const Point_t * a, const Point_t * b, Point_t * x, float arg
     x->y = a->y + ((b->y - a->y) * arg);
 }
 
-bool Screen::bx(const Point_t* p)
+bool Screen::bx(const Point_t* p) const
 {
     return !(p->x < 0 || p->y < 0 || p->x >= m_width || p->y >= m_height);
 }
 
-bool Screen::bx(int32_t x, int32_t y)
+bool Screen::bx(int32_t x, int32_t y) const
 {
     return !(x < 0 || y < 0 || x >= m_width || y >= m_height);
 }
 
-bool Screen::bx(const Rect_t* r)
+bool Screen::bx(const Rect_t* r) const
 {
     return (bx(r->x, r->y) || bx(r->x + r->w, r->y + r->h));
 }
@@ -762,6 +862,59 @@ void Screen::bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, con
                 break;
             case MODE_INVERT_INVERT:
                 setPixel_nbx(destRect->x + i, destRect->y + j, pixel ? NONE : INVERT);
+                break;
+            }
+        }
+    }
+}
+
+void Screen::bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode)
+{
+    if(!bx(destRect))
+        return;
+
+    uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
+
+    Point_t destPix;
+
+    for(uint32_t j = 0; j < destRect->h; j++)
+    {
+        for(uint32_t i = 0; i < destRect->w; i++)
+        {
+            destPix.x = destRect->x + i;
+            destPix.y = destRect->y + j;
+
+            if(!bx(&destPix))
+                continue;
+
+            uint8_t pixel = BMP_PIX(srcRect->x + ((i*srcRect->w)/destRect->w), srcRect->y + ((j*srcRect->h)/destRect->h));
+            //BMP_PIX(srcRect->x + i, srcRect->y + j);
+            switch(mode)
+            {
+            case MODE_BLEND:
+                setPixel_nbx(&destPix, pixel ? WHITE : NONE);
+                break;
+            case MODE_MASK:
+                setPixel_nbx(&destPix, pixel ? NONE : BLACK);
+                break;
+            case MODE_OVERWRITE:
+                setPixel_nbx(&destPix, pixel ? WHITE : BLACK);
+                break;
+            case MODE_INVERT:
+                setPixel_nbx(&destPix, pixel ? INVERT : NONE);
+                break;
+
+            case MODE_BLEND_INVERT:
+                setPixel_nbx(&destPix, pixel ? NONE : WHITE);
+                break;
+            case MODE_MASK_INVERT:
+                setPixel_nbx(&destPix, pixel ? BLACK : NONE);
+                break;
+            case MODE_OVERWRITE_INVERT:
+                setPixel_nbx(&destPix, pixel ? BLACK : WHITE);
+                break;
+            case MODE_INVERT_INVERT:
+                setPixel_nbx(&destPix, pixel ? NONE : INVERT);
                 break;
             }
         }
