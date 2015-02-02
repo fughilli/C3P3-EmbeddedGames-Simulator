@@ -74,15 +74,15 @@ bool frameWaitSemaphore;
 
 void TVOut_WaitFrames(uint32_t fc)
 {
-    if (fc == 0)
-        return;
-    while (fc > 0)
-    {
-        while (frameWaitSemaphore)
-            ;//SysCtlSleep();
-        frameWaitSemaphore = true;
-        fc--;
-    }
+//    if (fc == 0)
+//        return;
+//    while (fc > 0)
+//    {
+//        while (frameWaitSemaphore)
+//            ;//SysCtlSleep();
+//        frameWaitSemaphore = true;
+//        fc--;
+//    }
 }
 
 void TVOut_Init()
