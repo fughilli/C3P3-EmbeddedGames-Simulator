@@ -1,0 +1,3 @@
+[submodule "gamelib/utils/VectorLib"]
+	path = gamelib/utils/VectorLib
+	url = https://github.com/fughilli/VectorLib
