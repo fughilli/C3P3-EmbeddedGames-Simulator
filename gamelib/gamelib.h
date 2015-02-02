@@ -12,5 +12,7 @@
 #include "display/screen.h"
 #include "input/remote.h"
 
+#include "utils/math/game_math.h"
+
 #endif /* GAMELIB_H_ */
 
