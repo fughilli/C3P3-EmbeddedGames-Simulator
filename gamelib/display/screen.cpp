@@ -103,12 +103,12 @@ Color_t Screen::getPixel(const Point_t* p) const
 }
 
 
-uint32_t Screen::getWidth() const
+int32_t Screen::getWidth() const
 {
     return m_width;
 }
 
-uint32_t Screen::getHeight() const
+int32_t Screen::getHeight() const
 {
     return m_height;
 }
@@ -545,11 +545,11 @@ void Screen::line_nbx(const Point_t* p1, const Point_t* p2, Color_t color)
     }
     else if (p1->x == p2->x)
     {
-        vline_nbx(p1->x, p1->y, p2->y, color);
+        vline(p1->x, p1->y, p2->y, color);
     }
     else if (p1->y == p2->y)
     {
-        hline_nbx(p1->y, p1->x, p2->x, color);
+        hline(p1->y, p1->x, p2->x, color);
     }
     else
     {

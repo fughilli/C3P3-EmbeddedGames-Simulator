@@ -62,8 +62,8 @@ public:
     Screen(uint8_t** _fbuf, int32_t _w, int32_t _h);
 
     // Raster dims
-	uint32_t getWidth() const;
-	uint32_t getHeight() const;
+	int32_t getWidth() const;
+	int32_t getHeight() const;
 
     // Pixel access
 	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
