@@ -71,6 +71,9 @@ int main(int argc, char* argv[])
         compat_disp_interface->fillFromBitmap(TVOut_Framebuffer);
         compat_disp_interface->flip();
 
+        compat_disp_interface->fillFromBitmap(TVOut_Framebuffer);
+        compat_disp_interface->flip();
+
         screen.clear(BLACK);
     }
 
