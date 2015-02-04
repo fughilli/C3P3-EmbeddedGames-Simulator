@@ -1,4 +1,5 @@
 #include "disp3d.h"
+#include "screen.h"
 
 // Credit: http://www.songho.ca/opengl/gl_projectionmatrix.html
 Matrix4x4 Display3D::glFrustum(fp_type left, fp_type right, fp_type bottom, fp_type top, fp_type nearVal, fp_type farVal)
@@ -55,4 +56,67 @@ bool Display3D::glProject(const Matrix4x4& projMat, const Vector3d& other, Vecto
 Matrix4x4 Display3D::matFromTransforms(const Quaternion& rot, const Vector3d& trans, fp_type scale)
 {
     Matrix4x4 ret = Matrix4x4(rot) * Matrix4x4(trans) * Matrix4x4(scale);
+}
+
+bool Display3D::drawVertexBufferF(void* workspace, const uint16_t wspclen, const Vector3d* vbuf, uint16_t vbuflen, const uint16_t* tlist, uint16_t tlistlen, const Matrix4x4& projMat)
+{
+    if(((vbuflen*(sizeof(Point_t) + sizeof(fp_type))) > wspclen) || (tlistlen % 3))
+    {
+        return false;
+    }
+
+    int32_t hsw = screen.getWidth()/2;
+    int32_t hsh = screen.getHeight()/2;
+
+    Point_t* screen_coords = (Point_t*)(workspace);
+    fp_type* depths = (fp_type*)(((int)workspace) + (vbuflen * sizeof(Point_t)));
+
+    Vector3d temp;
+
+    for(uint32_t i = 0; i < vbuflen; i++)
+    {
+        glProject(projMat, vbuf[i], temp, depths[i]);
+
+        screen_coords[i].x = hsw + (temp.x * hsw);
+        screen_coords[i].y = hsh + (temp.y * hsh);
+    }
+
+    for(uint32_t i = 0; i < tlistlen; i += 3)
+    {
+        screen.line(&screen_coords[tlist[i]], &screen_coords[tlist[i+1]], WHITE);
+        screen.line(&screen_coords[tlist[i+1]], &screen_coords[tlist[i+2]], WHITE);
+        screen.line(&screen_coords[tlist[i+2]], &screen_coords[tlist[i]], WHITE);
+    }
+}
+
+bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const int16_t* vbuf, uint16_t vbuflen, const uint16_t* tlist, uint16_t tlistlen, const Matrix4x4& projMat)
+{
+    if(((vbuflen*(sizeof(Point_t) + sizeof(fp_type))) > wspclen) || (tlistlen % 3))
+    {
+        return false;
+    }
+
+    int32_t hsw = screen.getWidth()/2;
+    int32_t hsh = screen.getHeight()/2;
+
+    Point_t* screen_coords = (Point_t*)(workspace);
+    fp_type* depths = (fp_type*)(((int)workspace) + (vbuflen * sizeof(Point_t)));
+
+    Vector3d temp, tempin;
+
+    for(uint32_t i = 0; i < vbuflen; i++)
+    {
+        tempin = Vector3d(vbuf[i*3], vbuf[i*3+1], vbuf[i*3+2]);
+        glProject(projMat, tempin, temp, depths[i]);
+
+        screen_coords[i].x = hsw + (temp.x * hsw);
+        screen_coords[i].y = hsh + (temp.y * hsh);
+    }
+
+    for(uint32_t i = 0; i < tlistlen; i += 3)
+    {
+        screen.line(&screen_coords[tlist[i]], &screen_coords[tlist[i+1]], WHITE);
+        screen.line(&screen_coords[tlist[i+1]], &screen_coords[tlist[i+2]], WHITE);
+        screen.line(&screen_coords[tlist[i+2]], &screen_coords[tlist[i]], WHITE);
+    }
 }
