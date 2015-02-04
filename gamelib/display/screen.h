@@ -15,6 +15,8 @@
 extern "C" {
 #endif
 
+typedef int16_t screen_coord_t;
+
 typedef enum
 {
 	BLACK = 0, WHITE = 1, INVERT = 2, NONE = 3
@@ -35,17 +37,17 @@ typedef enum
 typedef struct
 {
 	const uint8_t * data;
-	uint32_t w, h;
+	screen_coord_t w, h;
 } Bitmap_t;
 
 typedef struct
 {
-	int32_t x, y, w, h;
+	screen_coord_t x, y, w, h;
 } Rect_t;
 
 typedef struct
 {
-	int32_t x, y;
+	screen_coord_t x, y;
 } Point_t;
 
 #ifdef __cplusplus
@@ -54,34 +56,55 @@ typedef struct
 
 class Screen {
 protected:
-    int32_t m_width;
-    int32_t m_height;
+    screen_coord_t m_width;
+    screen_coord_t m_height;
+
+    screen_coord_t m_bytewidth;
 
     uint8_t** framebuffer;
 public:
-    Screen(uint8_t** _fbuf, int32_t _w, int32_t _h);
+    Screen(uint8_t** _fbuf, screen_coord_t _w, screen_coord_t _h);
 
     // Raster dims
-	int32_t getWidth() const;
-	int32_t getHeight() const;
+	screen_coord_t getWidth() const;
+	screen_coord_t getHeight() const;
 
     // Pixel access
-	void setPixel_nbx(int32_t x, int32_t y, Color_t color);
-	void setPixel(int32_t x, int32_t y, Color_t color);
+	void setPixel_nbx(screen_coord_t x, screen_coord_t y, Color_t color);
+	void setPixel(screen_coord_t x, screen_coord_t y, Color_t color);
 	void setPixel_nbx(const Point_t* p, Color_t color);
 	void setPixel(const Point_t* p, Color_t color);
 
-	Color_t getPixel_nbx(int32_t x, int32_t y) const;
-	Color_t getPixel(int32_t x, int32_t y) const;
+	Color_t getPixel_nbx(screen_coord_t x, screen_coord_t y) const;
+	Color_t getPixel(screen_coord_t x, screen_coord_t y) const;
 	Color_t getPixel_nbx(const Point_t* p) const;
 	Color_t getPixel(const Point_t* p) const;
 
 	// Clear
 	void clear(Color_t color);
 
+	// Lines
+	void hline(screen_coord_t line, screen_coord_t x1, screen_coord_t x2, Color_t color);
+	void hline_nbx(screen_coord_t line, screen_coord_t x1, screen_coord_t x2, Color_t color);
+	void vline(screen_coord_t col, screen_coord_t y1, screen_coord_t y2, Color_t color);
+	void vline_nbx(screen_coord_t col, screen_coord_t y1, screen_coord_t y2, Color_t color);
+
+	void line(const Point_t* p1, const Point_t* p2, Color_t color);
+	void line_nbx(const Point_t* p1, const Point_t* p2, Color_t color, bool draw_nbx = false);
+
+    // Boxes
+	void box(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2, screen_coord_t y2, Color_t color, Color_t fcolor);
+	void box_nbx(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2, screen_coord_t y2, Color_t color, Color_t fcolor);
+	void box(const Rect_t * box, Color_t color, Color_t fcolor);
+
+    // Circles
+	void circle(screen_coord_t x, screen_coord_t y, screen_coord_t r, Color_t color, Color_t fcolor);
+	void circle_nbx(screen_coord_t x, screen_coord_t y, screen_coord_t r, Color_t color, Color_t fcolor);
+	void circle(const Point_t * pos, screen_coord_t r, Color_t color, Color_t fcolor);
+
     // Blits
-	void bitmap(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
-	void bitmap_nbx(int32_t x, int32_t y, const uint8_t * bitmap, int32_t w, int32_t h, Bitmap_mode_t mode);
+	void bitmap(screen_coord_t x, screen_coord_t y, const uint8_t * bitmap, screen_coord_t w, screen_coord_t h, Bitmap_mode_t mode);
+	void bitmap_nbx(screen_coord_t x, screen_coord_t y, const uint8_t * bitmap, screen_coord_t w, screen_coord_t h, Bitmap_mode_t mode);
 	void bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
@@ -89,31 +112,18 @@ public:
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
 	void bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
-	void bitmap_affine_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, const Point_t * v1, const Point_t * v2, Bitmap_mode_t mode);
-	void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode);
+	//void bitmap_affine_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t * dest, const Point_t * v1, const Point_t * v2, Bitmap_mode_t mode);
+	//void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode);
 
-    // Lines
-	void hline(int32_t line, int32_t x1, int32_t x2, Color_t color);
-	void hline_nbx(int32_t line, int32_t x1, int32_t x2, Color_t color);
-	void vline(int32_t col, int32_t y1, int32_t y2, Color_t color);
-	void vline_nbx(int32_t col, int32_t y1, int32_t y2, Color_t color);
-
-	void line(const Point_t* p1, const Point_t* p2, Color_t color);
-	void line_nbx(const Point_t* p1, const Point_t* p2, Color_t color);
-
-    // Boxes
-	void box(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color, Color_t fcolor);
-	void box_nbx(int32_t x1, int32_t y1, int32_t x2, int32_t y2, Color_t color, Color_t fcolor);
-	void box(const Rect_t * box, Color_t color, Color_t fcolor);
-
-    // Circles
-	void circle(int32_t x, int32_t y, int32_t r, Color_t color, Color_t fcolor);
-	void circle_nbx(int32_t x, int32_t y, int32_t r, Color_t color, Color_t fcolor);
-	void circle(const Point_t * pos, int32_t r, Color_t color, Color_t fcolor);
+    // Triangles
+    void triangle(const Point_t* p1, const Point_t* p2, const Point_t* p3, Color_t color, Color_t fcolor);
+    void triangle_bitmap(const Bitmap_t* bmp,
+                         const Point_t* src_p1, const Point_t* src_p2, const Point_t* src_p3,
+                         const Point_t* dest_p1, const Point_t* dest_p2, const Point_t* dest_p3);
 
     // Bounds check
 	bool bx(const Point_t* p) const;
-	bool bx(int32_t x, int32_t y) const;
+	bool bx(screen_coord_t x, screen_coord_t y) const;
 	bool bx(const Rect_t* r) const;
 };
 
