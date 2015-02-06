@@ -81,17 +81,30 @@ bool Display3D::drawVertexBufferF(void* workspace, const uint16_t wspclen, const
         screen_coords[i].y = hsh + (temp.y * hsh);
     }
 
+    Point_t a,b,c;
+    int16_t dx1, dx2, dy1, dy2;
+
     for(uint32_t i = 0; i < tlistlen; i += 3)
     {
-        screen.line(&screen_coords[tlist[i]], &screen_coords[tlist[i+1]], WHITE);
-        screen.line(&screen_coords[tlist[i+1]], &screen_coords[tlist[i+2]], WHITE);
-        screen.line(&screen_coords[tlist[i+2]], &screen_coords[tlist[i]], WHITE);
+        a = screen_coords[tlist[i]];
+        b = screen_coords[tlist[i+1]];
+        c = screen_coords[tlist[i+2]];
+
+        dy1 = a.y - b.y;
+        dy2 = c.y - b.y;
+        dx1 = a.x - b.x;
+        dx2 = c.x - b.x;
+
+        if((dx1*dy2 - dy1*dx2) < 0)
+            continue;
+
+        screen.triangle(&a, &b, &c, BLACK, WHITE);
     }
 }
 
 bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const int16_t* vbuf, uint16_t vbuflen, const uint16_t* tlist, uint16_t tlistlen, const Matrix4x4& projMat)
 {
-    if(((vbuflen*(sizeof(Point_t) + sizeof(fp_type))) > wspclen) || (tlistlen % 3))
+    if(((vbuflen*(sizeof(Point_t) + sizeof(fp_type))) > wspclen) || (tlistlen % 3) || (vbuflen % 3))
     {
         return false;
     }
@@ -113,10 +126,23 @@ bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const
         screen_coords[i].y = hsh + (temp.y * hsh);
     }
 
+    Point_t a,b,c;
+    int16_t dx1, dx2, dy1, dy2;
+
     for(uint32_t i = 0; i < tlistlen; i += 3)
     {
-        screen.line(&screen_coords[tlist[i]], &screen_coords[tlist[i+1]], WHITE);
-        screen.line(&screen_coords[tlist[i+1]], &screen_coords[tlist[i+2]], WHITE);
-        screen.line(&screen_coords[tlist[i+2]], &screen_coords[tlist[i]], WHITE);
+        a = screen_coords[tlist[i]];
+        b = screen_coords[tlist[i+1]];
+        c = screen_coords[tlist[i+2]];
+
+        dy1 = a.y - b.y;
+        dy2 = c.y - b.y;
+        dx1 = a.x - b.x;
+        dx2 = c.x - b.x;
+
+        if((dx1*dy2 - dy1*dx2) < 0)
+            continue;
+
+        screen.triangle(&a, &b, &c, BLACK, WHITE);
     }
 }
