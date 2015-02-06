@@ -12,6 +12,8 @@
 // For NULL:
 #include <stdlib.h>
 
+const Point_t Point_t::zero = Point_t();
+
 Screen::Screen(uint8_t** _fbuf, screen_coord_t _w, screen_coord_t _h)
 {
     framebuffer = _fbuf;
@@ -592,11 +594,10 @@ void Screen::line_nbx(const Point_t* p1, const Point_t* p2, Color_t color, bool 
                     setPixel_nbx(wy_1, wx_1, color);
                 else
                     setPixel(wy_1, wx_1, color);
+            else if(draw_nbx)
+                setPixel_nbx(wx_1, wy_1, color);
             else
-                if(draw_nbx)
-                    setPixel_nbx(wx_1, wy_1, color);
-                else
-                    setPixel(wx_1, wy_1, color);
+                setPixel(wx_1, wy_1, color);
 
             err -= dy;
             if (err < 0)
@@ -892,29 +893,29 @@ void Screen::bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const R
             switch(mode)
             {
             case MODE_BLEND:
-                setPixel_nbx(&destPix, pixel ? WHITE : NONE);
+                setPixel(&destPix, pixel ? WHITE : NONE);
                 break;
             case MODE_MASK:
-                setPixel_nbx(&destPix, pixel ? NONE : BLACK);
+                setPixel(&destPix, pixel ? NONE : BLACK);
                 break;
             case MODE_OVERWRITE:
-                setPixel_nbx(&destPix, pixel ? WHITE : BLACK);
+                setPixel(&destPix, pixel ? WHITE : BLACK);
                 break;
             case MODE_INVERT:
-                setPixel_nbx(&destPix, pixel ? INVERT : NONE);
+                setPixel(&destPix, pixel ? INVERT : NONE);
                 break;
 
             case MODE_BLEND_INVERT:
-                setPixel_nbx(&destPix, pixel ? NONE : WHITE);
+                setPixel(&destPix, pixel ? NONE : WHITE);
                 break;
             case MODE_MASK_INVERT:
-                setPixel_nbx(&destPix, pixel ? BLACK : NONE);
+                setPixel(&destPix, pixel ? BLACK : NONE);
                 break;
             case MODE_OVERWRITE_INVERT:
-                setPixel_nbx(&destPix, pixel ? BLACK : WHITE);
+                setPixel(&destPix, pixel ? BLACK : WHITE);
                 break;
             case MODE_INVERT_INVERT:
-                setPixel_nbx(&destPix, pixel ? NONE : INVERT);
+                setPixel(&destPix, pixel ? NONE : INVERT);
                 break;
             }
         }
@@ -922,5 +923,265 @@ void Screen::bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const R
 }
 
 #undef BMP_PIX
+
+void Screen::triangleArea(const Point_t* p1, const Point_t* p2, const Point_t* p3, Color_t fcolor)
+{
+    int16_t wx4 = p1->x;
+    int16_t wy4 = p1->y;
+    int16_t wx5 = p1->x;
+    int16_t wy5 = p1->y;
+
+    bool changed1 = false;
+    bool changed2 = false;
+
+    int16_t dx1 = abs(p2->x - p1->x);
+    int16_t dy1 = abs(p2->y - p1->y);
+
+    int16_t dx2 = abs(p3->x - p1->x);
+    int16_t dy2 = abs(p3->y - p1->y);
+
+    int16_t signx1 = (p2->x >= p1->x) ? +1 : -1;
+    int16_t signx2 = (p3->x >= p1->x) ? +1 : -1;
+
+    int16_t signy1 = (p2->y >= p1->y) ? +1 : -1;
+    int16_t signy2 = (p3->y >= p1->y) ? +1 : -1;
+
+    screen_coord_t temp;
+
+    if (dy1 > dx1)     // swap values
+    {
+        temp = dx1;
+        dx1 = dy1;
+        dy1 = temp;
+        changed1 = true;
+    }
+
+    if (dy2 > dx2)     // swap values
+    {
+        temp = dx2;
+        dx2 = dy2;
+        dy2 = temp;
+        changed2 = true;
+    }
+
+    int16_t e1 = 2 * dy1 - dx1;
+    int16_t e2 = 2 * dy2 - dx2;
+
+    Point_t a, b;
+
+    int canary = 0;
+
+    for (int i = 0; i <= dx1; i++)
+    {
+        a.x = wx4;
+        a.y = wy4;
+
+        b.x = wx5;
+        b.y = wy5;
+        line(&a, &b, fcolor);
+
+        if(dx1)
+            while (e1 >= 0)
+            {
+                if (changed1) wx4 += signx1;
+                else wy4 += signy1;
+                e1 = e1 - 2 * dx1;
+            }
+
+        if (changed1) wy4 += signy1;
+        else wx4 += signx1;
+
+        e1 = e1 + 2 * dy1;
+
+        while (wy5 != wy4)
+        {
+            if(dx2)
+                while (e2 >= 0)
+                {
+                    if (changed2) wx5 += signx2;
+                    else wy5 += signy2;
+                    e2 = e2 - 2 * dx2;
+                }
+
+            if (changed2) wy5 += signy2;
+            else wx5 += signx2;
+
+            e2 = e2 + 2 * dy2;
+        }
+    }
+}
+
+//class TexInterpFunctor
+//{
+//public:
+//    Point_t tex1, Point_t tex2, Point_t tex3;
+//    TexInterpFunctor(Point_t _tex1, Point_t _tex2, Point_t _tex3)
+//    {
+//        tex1 = _tex1;
+//        tex2 = _tex2;
+//        tex3 = _tex3;
+//    }
+//
+//    Point_t operator()(Point_t sc)
+//    {
+//
+//    }
+//};
+//
+//void Screen::bitmap_triArea(const Point_t* p1, const Point_t* p2, const Point_t* p3, TexInterpFunctor& tif, Color_t fcolor)
+//{
+//    int16_t wx4 = p1->x;
+//    int16_t wy4 = p1->y;
+//    int16_t wx5 = p1->x;
+//    int16_t wy5 = p1->y;
+//
+//    bool changed1 = false;
+//    bool changed2 = false;
+//
+//    int16_t dx1 = abs(p2->x - p1->x);
+//    int16_t dy1 = abs(p2->y - p1->y);
+//
+//    int16_t dx2 = abs(p3->x - p1->x);
+//    int16_t dy2 = abs(p3->y - p1->y);
+//
+//    int16_t signx1 = (p2->x >= p1->x) ? +1 : -1;
+//    int16_t signx2 = (p3->x >= p1->x) ? +1 : -1;
+//
+//    int16_t signy1 = (p2->y >= p1->y) ? +1 : -1;
+//    int16_t signy2 = (p3->y >= p1->y) ? +1 : -1;
+//
+//    screen_coord_t temp;
+//
+//    if (dy1 > dx1)     // swap values
+//    {
+//        temp = dx1;
+//        dx1 = dy1;
+//        dy1 = temp;
+//        changed1 = true;
+//    }
+//
+//    if (dy2 > dx2)     // swap values
+//    {
+//        temp = dx2;
+//        dx2 = dy2;
+//        dy2 = temp;
+//        changed2 = true;
+//    }
+//
+//    int16_t e1 = 2 * dy1 - dx1;
+//    int16_t e2 = 2 * dy2 - dx2;
+//
+//    Point_t a, b;
+//
+//    int canary = 0;
+//
+//    for (int i = 0; i <= dx1; i++)
+//    {
+//        a.x = wx4;
+//        a.y = wy4;
+//
+//        b.x = wx5;
+//        b.y = wy5;
+//        line(&a, &b, fcolor);
+//
+//        if(dx1)
+//            while (e1 >= 0)
+//            {
+//                if (changed1) wx4 += signx1;
+//                else wy4 += signy1;
+//                e1 = e1 - 2 * dx1;
+//            }
+//
+//        if (changed1) wy4 += signy1;
+//        else wx4 += signx1;
+//
+//        e1 = e1 + 2 * dy1;
+//
+//        while (wy5 != wy4)
+//        {
+//            if(dx2)
+//                while (e2 >= 0)
+//                {
+//                    if (changed2) wx5 += signx2;
+//                    else wy5 += signy2;
+//                    e2 = e2 - 2 * dx2;
+//                }
+//
+//            if (changed2) wy5 += signy2;
+//            else wx5 += signx2;
+//
+//            e2 = e2 + 2 * dy2;
+//        }
+//    }
+//}
+
+void Screen::triangle(const Point_t* _p1, const Point_t* _p2, const Point_t* _p3, Color_t color, Color_t fcolor)
+{
+    Point_t p1 = *_p1;
+    Point_t p2 = *_p2;
+    Point_t p3 = *_p3;
+
+    if(color == NONE)
+        return;
+
+    if(fcolor != NONE)
+    {
+        bool b = true;
+
+        // Graham Scan + Andrew's Monotone Chain Algorithm
+        // Sort by ascending y
+        while (b)
+        {
+            screen_coord_t temp;
+            b = false;
+            if ((b == false) && (p1.y > p2.y))
+            {
+                temp = p1.x;
+                p1.x = p2.x;
+                p2.x = temp;
+
+                temp = p1.y;
+                p1.y = p2.y;
+                p2.y = temp;
+                b = true;
+            }
+            if ((b == false) && (p2.y > p3.y))
+            {
+                temp = p3.x;
+                p3.x = p2.x;
+                p2.x = temp;
+
+                temp = p3.y;
+                p3.y = p2.y;
+                p2.y = temp;
+                b = true;
+            }
+        }
+
+        if (p2.y == p3.y)
+        {
+            triangleArea(&p1, &p2, &p3, fcolor);
+
+        }
+        else if (p1.y == p2.y)
+        {
+            triangleArea(&p3, &p1, &p2, fcolor);
+
+        }
+        else
+        {
+            Point_t p4;
+            p4.x = (screen_coord_t)( (int32_t)p1.x + (p2.y - p1.y) * (p3.x - p1.x) / (p3.y - p1.y) );
+            p4.y = p2.y;
+
+            triangleArea(&p1, &p2, &p4, fcolor);
+            triangleArea(&p3, &p2, &p4, fcolor);
+        }
+    }
+
+    line(_p1, _p2, color);
+    line(_p2, _p3, color);
+    line(_p3, _p1, color);
+}
 
 Screen screen(&TVOut_Framebuffer, FB_WIDTH, FB_HEIGHT);

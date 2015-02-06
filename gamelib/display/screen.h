@@ -10,19 +10,16 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "../utils/VectorLib/Vector.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef int32_t screen_coord_t;
 
-typedef int16_t screen_coord_t;
-
-typedef enum
+enum Color_t
 {
 	BLACK = 0, WHITE = 1, INVERT = 2, NONE = 3
-} Color_t;
+};
 
-typedef enum
+enum Bitmap_mode_t
 {
 	MODE_OVERWRITE,
 	MODE_OVERWRITE_INVERT,
@@ -32,27 +29,92 @@ typedef enum
 	MODE_MASK_INVERT,
 	MODE_INVERT,
 	MODE_INVERT_INVERT
-} Bitmap_mode_t;
+};
 
-typedef struct
+struct Bitmap_t
 {
 	const uint8_t * data;
 	screen_coord_t w, h;
-} Bitmap_t;
 
-typedef struct
+	Bitmap_t()
+	{
+	    data = nullptr;
+	    w = h = 0;
+	}
+
+	Bitmap_t(const uint8_t * _data, screen_coord_t _w, screen_coord_t _h)
+	{
+	    data = _data;
+	    w = _w;
+	    h = _h;
+	}
+};
+
+struct Rect_t
 {
-	screen_coord_t x, y, w, h;
-} Rect_t;
+    screen_coord_t x, y, w, h;
 
-typedef struct
+    Rect_t()
+    {
+        x = y = w = h = 0;
+    }
+
+    Rect_t(screen_coord_t _x, screen_coord_t _y, screen_coord_t _w, screen_coord_t _h)
+    {
+        x = _x;
+        y = _y;
+        w = _w;
+        h = _h;
+    }
+};
+
+struct Point_t
 {
 	screen_coord_t x, y;
-} Point_t;
 
-#ifdef __cplusplus
-}
-#endif
+	Point_t()
+	{
+	    x = y = 0;
+	}
+
+	Point_t(screen_coord_t _x, screen_coord_t _y)
+	{
+	    x = _x;
+        y = _y;
+    }
+
+    Point_t operator+(const Point_t& other)
+    {
+        Point_t ret;
+        ret.x = x + other.x;
+        ret.y = y + other.y;
+        return ret;
+    }
+
+    Point_t operator-(const Point_t& other)
+    {
+        Point_t ret;
+        ret.x = x - other.x;
+        ret.y = y - other.y;
+        return ret;
+    }
+
+    Point_t operator*(int16_t scalar)
+    {
+        Point_t ret;
+        ret.x = x * scalar;
+        ret.y = y * scalar;
+        return ret;
+    }
+
+    void fromVector2d(const Vector2d& other)
+    {
+        x = (screen_coord_t)other.x;
+        y = (screen_coord_t)other.y;
+    }
+
+    const static Point_t zero;
+};
 
 class Screen {
 protected:
@@ -116,6 +178,7 @@ public:
 	//void bitmap_arbtra_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Point_t dest[4], Bitmap_mode_t mode);
 
     // Triangles
+    void triangleArea(const Point_t* p1, const Point_t* p2, const Point_t* p3, Color_t fcolor);
     void triangle(const Point_t* p1, const Point_t* p2, const Point_t* p3, Color_t color, Color_t fcolor);
     void triangle_bitmap(const Bitmap_t* bmp,
                          const Point_t* src_p1, const Point_t* src_p2, const Point_t* src_p3,
