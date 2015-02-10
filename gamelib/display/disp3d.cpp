@@ -56,6 +56,7 @@ bool Display3D::glProject(const Matrix4x4& projMat, const Vector3d& other, Vecto
 Matrix4x4 Display3D::matFromTransforms(const Quaternion& rot, const Vector3d& trans, fp_type scale)
 {
     Matrix4x4 ret = Matrix4x4(rot) * Matrix4x4(trans) * Matrix4x4(scale);
+    return ret;
 }
 
 bool Display3D::drawVertexBufferF(void* workspace, const uint16_t wspclen, const Vector3d* vbuf, uint16_t vbuflen, const uint16_t* tlist, uint16_t tlistlen, const Matrix4x4& projMat)
@@ -95,11 +96,13 @@ bool Display3D::drawVertexBufferF(void* workspace, const uint16_t wspclen, const
         dx1 = a.x - b.x;
         dx2 = c.x - b.x;
 
-        if((dx1*dy2 - dy1*dx2) < 0)
-            continue;
+//        if((dx1*dy2 - dy1*dx2) < 0)
+//            continue;
 
-        screen.triangle(&a, &b, &c, BLACK, WHITE);
+        screen.triangle(&a, &b, &c, WHITE, NONE);
     }
+
+    return true;
 }
 
 bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const int16_t* vbuf, uint16_t vbuflen, const uint16_t* tlist, uint16_t tlistlen, const Matrix4x4& projMat)
@@ -140,9 +143,11 @@ bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const
         dx1 = a.x - b.x;
         dx2 = c.x - b.x;
 
-        if((dx1*dy2 - dy1*dx2) < 0)
-            continue;
+//        if((dx1*dy2 - dy1*dx2) < 0)
+//            continue;
 
-        screen.triangle(&a, &b, &c, BLACK, WHITE);
+        screen.triangle(&a, &b, &c, WHITE, NONE);
     }
+
+    return true;
 }
