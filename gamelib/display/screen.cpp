@@ -829,11 +829,11 @@ bool Screen::bx(const Rect_t* r) const
 
 void Screen::bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode)
 {
-    uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
+    int32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
 
-    for(uint32_t j = 0; j < destRect->h; j++)
+    for(int32_t j = 0; j < destRect->h; j++)
     {
-        for(uint32_t i = 0; i < destRect->w; i++)
+        for(int32_t i = 0; i < destRect->w; i++)
         {
             uint8_t pixel = BMP_PIX(srcRect->x + ((i*srcRect->w)/destRect->w), srcRect->y + ((j*srcRect->h)/destRect->h));
             //BMP_PIX(srcRect->x + i, srcRect->y + j);
@@ -874,13 +874,13 @@ void Screen::bitmap_scaled(const Bitmap_t * bmp, const Rect_t * srcRect, const R
     if(!bx(destRect))
         return;
 
-    uint32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
+    int32_t bmp_byte_width = bmp->w/8 + ((bmp->w % 8) ? 1 : 0);
 
     Point_t destPix;
 
-    for(uint32_t j = 0; j < destRect->h; j++)
+    for(int32_t j = 0; j < destRect->h; j++)
     {
-        for(uint32_t i = 0; i < destRect->w; i++)
+        for(int32_t i = 0; i < destRect->w; i++)
         {
             destPix.x = destRect->x + i;
             destPix.y = destRect->y + j;
@@ -968,8 +968,6 @@ void Screen::triangleArea(const Point_t* p1, const Point_t* p2, const Point_t* p
     int16_t e2 = 2 * dy2 - dx2;
 
     Point_t a, b;
-
-    int canary = 0;
 
     for (int i = 0; i <= dx1; i++)
     {
