@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="GameConsoleSimulator" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/GameConsoleSimulator" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/GameConsoleSimulator" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="C:/SDL2-2.0.3/i686-w64-mingw32/include" />
+		</Compiler>
+		<Linker>
+			<Add option="-lmingw32 -lSDL2main -lSDL2" />
+			<Add library="C:\SDL2-2.0.3\i686-w64-mingw32\lib\libSDL2.a" />
+			<Add library="C:\SDL2-2.0.3\i686-w64-mingw32\lib\libSDL2main.a" />
+			<Add directory="C:/SDL2-2.0.3/i686-w64-mingw32/lib" />
+		</Linker>
+		<Unit filename="bitmaps/arrow.cpp" />
+		<Unit filename="bitmaps/arrow.h" />
+		<Unit filename="bitmaps/gunsprite_detail.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/gunsprite_detail.h" />
+		<Unit filename="bitmaps/gunsprite_mask.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/gunsprite_mask.h" />
+		<Unit filename="bitmaps/hellojustin.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/hellojustin.h" />
+		<Unit filename="bitmaps/littleman_fixed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/littleman_fixed.h" />
+		<Unit filename="bitmaps/man_walk.cpp" />
+		<Unit filename="bitmaps/man_walk.h" />
+		<Unit filename="bitmaps/smiley.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/smiley.h" />
+		<Unit filename="bitmaps/watchmen_bw.cpp" />
+		<Unit filename="bitmaps/watchmen_bw.h" />
+		<Unit filename="game/game.cpp" />
+		<Unit filename="game/game.h" />
+		<Unit filename="gamelib/compat/SDL_DisplayInterface.cpp" />
+		<Unit filename="gamelib/compat/SDL_DisplayInterface.h" />
+		<Unit filename="gamelib/compat/compat_main.cpp" />
+		<Unit filename="gamelib/compat/compat_main.h" />
+		<Unit filename="gamelib/display/disp3d.cpp" />
+		<Unit filename="gamelib/display/disp3d.h" />
+		<Unit filename="gamelib/display/screen.cpp" />
+		<Unit filename="gamelib/display/screen.h" />
+		<Unit filename="gamelib/display/tvout.cpp" />
+		<Unit filename="gamelib/display/tvout.h" />
+		<Unit filename="gamelib/display/tvout_constants.h" />
+		<Unit filename="gamelib/gamelib.h" />
+		<Unit filename="gamelib/input/remote.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="gamelib/input/remote.h" />
+		<Unit filename="gamelib/utils/VectorLib/Matrix.cpp" />
+		<Unit filename="gamelib/utils/VectorLib/Matrix.h" />
+		<Unit filename="gamelib/utils/VectorLib/Quaternion.cpp" />
+		<Unit filename="gamelib/utils/VectorLib/Vector.h" />
+		<Unit filename="gamelib/utils/VectorLib/Vector2d.cpp" />
+		<Unit filename="gamelib/utils/VectorLib/Vector3d.cpp" />
+		<Unit filename="gamelib/utils/math/game_math.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
