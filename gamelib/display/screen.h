@@ -38,7 +38,7 @@ struct Bitmap_t
 
 	Bitmap_t()
 	{
-	    data = nullptr;
+	    data = NULL;
 	    w = h = 0;
 	}
 
