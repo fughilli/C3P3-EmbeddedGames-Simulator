@@ -5,8 +5,8 @@
  *      Author: Kevin
  */
 
-#ifndef TVOUT_CONSTANTS_H_
-#define TVOUT_CONSTANTS_H_
+//#ifndef TVOUT_CONSTANTS_H_
+//#define TVOUT_CONSTANTS_H_
 
 //#define PAL
 #define NTSC
@@ -49,7 +49,7 @@
 #define FRONT_PORCH_GAP_NS (1650 + 200) //1650
 
 // Magnitude of a second relative to a nanosecond (10e9)
-#define NS_MAGNITUDE (1000000000)
+#define NS_MAGNITUDE (1000000000ul)
 
 // +--------------------+
 // | LINE NUM CONSTANTS |
@@ -89,16 +89,16 @@
 
 // SSI module frequency
 #if defined(ASPECT_16_9)
-#define TV_SSI_FREQ (7272727)
+#define TV_SSI_FREQ (7272727ul)
 #elif defined(ASPECT_4_3)
-#define TV_SSI_FREQ (6153846)
+#define TV_SSI_FREQ (6153846ul)
 #endif
 
 // Calculated horizontal resolution
-#define HORIZ_RESOLUTION ((unsigned int)((double)(TV_SSI_FREQ)*ACTIVE_VIDEO_LINE_TIME/1000000000))
+#define HORIZ_RESOLUTION ((unsigned int)((double)(TV_SSI_FREQ)*ACTIVE_VIDEO_LINE_TIME/1000000000.0))
 
 // Next multiple of 8 of horizontal resolution
-#define HORIZ_RESOLUTION_NMO_8 ((HORIZ_RESOLUTION%8)?((HORIZ_RESOLUTION&~(8-1))+8):(HORIZ_RESOLUTION))
+#define HORIZ_RESOLUTION_NMO_8 ((HORIZ_RESOLUTION%8)?((HORIZ_RESOLUTION&~(0x7))+8):(HORIZ_RESOLUTION))
 
-#endif /* TVOUT_CONSTANTS_H_ */
+//#endif /* TVOUT_CONSTANTS_H_ */
 

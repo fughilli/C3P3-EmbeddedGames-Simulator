@@ -6,14 +6,15 @@
  */
 
 #include "tvout.h"
+#include "tvout_constants.h"
 #include "../compat/SDL_DisplayInterface.h"
 #include "../compat/compat_main.h"
 
 #include <stdbool.h>
 
 // DOUBLE BUFFERS
-uint8_t framebuffer_A[FB_WIDTH * FB_HEIGHT / 8];
-uint8_t framebuffer_B[FB_WIDTH * FB_HEIGHT / 8];
+uint8_t framebuffer_A[((FB_WIDTH / 8) * FB_HEIGHT)];
+uint8_t framebuffer_B[((FB_WIDTH / 8) * FB_HEIGHT)];
 
 // EXTERNAL BUFFER POINTER (API)
 uint8_t * TVOut_Framebuffer;
