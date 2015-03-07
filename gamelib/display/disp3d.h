@@ -3,6 +3,7 @@
 
 #include "../utils/VectorLib/Matrix.h"
 #include "../utils/VectorLib/Vector.h"
+#include "stdint.h"
 
 class Display3D
 {
