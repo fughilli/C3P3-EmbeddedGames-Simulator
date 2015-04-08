@@ -116,6 +116,24 @@ struct Point_t
     const static Point_t zero;
 };
 
+struct Font_t
+{
+    Bitmap_t* bitmap;
+    uint8_t char_width;
+    uint8_t char_height;
+    uint8_t char_stride;
+    uint8_t char_kerning;
+
+    Font_t(Bitmap_t* fb, uint8_t w, uint8_t h, uint8_t s, uint8_t k)
+    {
+        bitmap = fb;
+        char_width = w;
+        char_height = h;
+        char_stride = s;
+        char_kerning = k;
+    }
+};
+
 class Screen {
 protected:
     screen_coord_t m_width;
@@ -170,6 +188,10 @@ public:
 	void bitmap(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
+
+	// Text
+	void text(Font_t& font, Point_t pt, const char* str);
+	void text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum));
 
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);

@@ -338,6 +338,10 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect
                     || mode == MODE_MASK_INVERT || mode == MODE_INVERT_INVERT)
                 stagingArea = ~stagingArea;
 
+            // Compensate for target regions less than 8 bits wide
+            if (srcRect->w < 8 && (((dest->x + srcRect->w) % 8) >= srcRect->w))
+                    dest_lEdgeMask |= dest_rEdgeMask;
+
             switch (mode)
             {
             case MODE_OVERWRITE:
@@ -416,6 +420,64 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect
         }
         fbRowOffset += m_bytewidth;
         bmpRowOffset += bmpByteWidth;
+    }
+}
+
+void Screen::text(Font_t& font, Point_t pt, const char* str)
+{
+    Rect_t srcRect, destRect;
+
+    srcRect.w = destRect.w = font.char_width;
+    srcRect.h = destRect.h = font.char_height;
+
+    srcRect.y = 0;
+    destRect.y = pt.y;
+    destRect.x = pt.x;
+
+    char c;
+    while(c = *str)
+    {
+        if(c >= 'A' && c <= 'Z')
+        {
+            srcRect.x = ((c-'A')*font.char_stride);
+            screen.bitmap(font.bitmap, &srcRect, &destRect, MODE_BLEND_INVERT);
+        }
+        destRect.x += (font.char_width + font.char_kerning);
+        str++;
+    }
+}
+
+void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum))
+{
+    Rect_t srcRect, destRect, modDestRect;
+
+    srcRect.w = destRect.w = font.char_width;
+    srcRect.h = destRect.h = font.char_height;
+
+
+
+    srcRect.y = 0;
+    destRect.y = pt.y;
+    destRect.x = pt.x;
+
+    uint32_t cnum = 0;
+
+    char c;
+    while(c = *str)
+    {
+        if(c >= 'A' && c <= 'Z')
+        {
+            Vector2d& pos = posmod(cnum);
+
+            modDestRect.x = destRect.x + pos.x;
+            modDestRect.y = destRect.y + pos.y;
+
+            srcRect.x = ((c-'A')*font.char_stride);
+            screen.bitmap(font.bitmap, &srcRect, &modDestRect, MODE_BLEND_INVERT);
+        }
+        destRect.x += (font.char_width + font.char_kerning);
+        str++;
+        cnum++;
     }
 }
 
