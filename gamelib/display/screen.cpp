@@ -423,7 +423,7 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect
     }
 }
 
-void Screen::text(Font_t& font, Point_t pt, const char* str)
+void Screen::text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect;
 
@@ -437,17 +437,25 @@ void Screen::text(Font_t& font, Point_t pt, const char* str)
     char c;
     while(c = *str)
     {
-        if(c >= 'A' && c <= 'Z')
+        if(c == '\n')
         {
-            srcRect.x = ((c-'A')*font.char_stride);
-            screen.bitmap(font.bitmap, &srcRect, &destRect, MODE_BLEND_INVERT);
+            destRect.y += (font.char_height * 4 / 3);
+            destRect.x = pt.x;
+            str++;
+            continue;
+        }
+        uint8_t idx;
+        if(idx = font.char_mapping(c))
+        {
+            srcRect.x = (idx*font.char_stride);
+            screen.bitmap(font.bitmap, &srcRect, &destRect, mode);
         }
         destRect.x += (font.char_width + font.char_kerning);
         str++;
     }
 }
 
-void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum))
+void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum), Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect, modDestRect;
 
@@ -465,15 +473,24 @@ void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2
     char c;
     while(c = *str)
     {
-        if(c >= 'A' && c <= 'Z')
+        if(c == '\n')
+        {
+            destRect.y += (font.char_height * 4 / 3);
+            destRect.x = pt.x;
+            cnum = 0;
+            str++;
+            continue;
+        }
+        uint8_t idx;
+        if(idx = font.char_mapping(c))
         {
             Vector2d& pos = posmod(cnum);
 
             modDestRect.x = destRect.x + pos.x;
             modDestRect.y = destRect.y + pos.y;
 
-            srcRect.x = ((c-'A')*font.char_stride);
-            screen.bitmap(font.bitmap, &srcRect, &modDestRect, MODE_BLEND_INVERT);
+            srcRect.x = (idx*font.char_stride);
+            screen.bitmap(font.bitmap, &srcRect, &modDestRect, mode);
         }
         destRect.x += (font.char_width + font.char_kerning);
         str++;
