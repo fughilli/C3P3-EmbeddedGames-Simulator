@@ -70,7 +70,7 @@ bool Display3D::drawVertexBufferF(void* workspace, const uint16_t wspclen, const
     int32_t hsh = screen.getHeight()/2;
 
     Point_t* screen_coords = (Point_t*)(workspace);
-    fp_type* depths = (fp_type*)(((int)workspace) + (vbuflen * sizeof(Point_t)));
+    fp_type* depths = (fp_type*)(((intptr_t)workspace) + (vbuflen * sizeof(Point_t)));
 
     Vector3d temp;
 
@@ -116,7 +116,7 @@ bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const
     int32_t hsh = screen.getHeight()/2;
 
     Point_t* screen_coords = (Point_t*)(workspace);
-    fp_type* depths = (fp_type*)(((int)workspace) + (vbuflen * sizeof(Point_t)));
+    fp_type* depths = (fp_type*)(((intptr_t)workspace) + (vbuflen * sizeof(Point_t)));
 
     Vector3d temp, tempin;
 
