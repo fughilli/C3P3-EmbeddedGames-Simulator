@@ -4,9 +4,6 @@
 #include <stdint.h>
 #include "tvout_constants.h"
 
-#define FB_WIDTH (HORIZ_RESOLUTION_NMO_8)
-#define FB_HEIGHT (NUM_VIDEO_LINES - FB_LINE_OFFSET)
-
 extern uint8_t * TVOut_Framebuffer;
 
 void TVOut_Init();

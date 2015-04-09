@@ -5,30 +5,13 @@
  *      Author: Kevin
  */
 
-//#ifndef TVOUT_CONSTANTS_H_
-//#define TVOUT_CONSTANTS_H_
+#ifndef TVOUT_CONSTANTS_H_
+#define TVOUT_CONSTANTS_H_
 
-//#define PAL
-#define NTSC
+#include "../gamelib_config.h"
 
-#define ASPECT_16_9
-//#define ASPECT_4_3
+#if (PLATFORM & PLATFORM_TIVAC)
 
-#if defined(PAL)
-#define SCANLINE_TIME_US 64
-#define BROAD_SYNC_GAP_NS 4700
-#define SHORT_SYNC_GAP_NS 2350
-#define HSYNC_GAP_NS 4700
-#define BACK_PORCH_GAP_NS 5700
-#define FRONT_PORCH_GAP_NS 2350 	//1650
-#define US_MAGNITUDE 1000000
-#define NUM_BROAD_SYNC_LINES 5
-#define NUM_SHORT_SYNC_LINES 5
-#define NUM_END_SHORT_SYNC_LINES 6
-#define NUM_DATA_LINES 304
-#define VIDEO_LINE_OFFSET 46
-#define NUM_VIDEO_LINES 229
-#elif defined(NTSC)
 // +----------------------------------+
 // | TIMING CONSTANTS, IN NANOSECONDS |
 // +----------------------------------+
@@ -75,8 +58,6 @@
 // Vertical offset of the framebuffer with respect to the first video line (before this, alternating lines are white and black)
 #define FB_LINE_OFFSET (9)
 
-#endif
-
 // Total lines in a frame
 #define TOTAL_LINES (((NUM_BROAD_SYNC_LINES + NUM_SHORT_SYNC_LINES + NUM_END_SHORT_SYNC_LINES)/2) + NUM_DATA_LINES)
 
@@ -88,9 +69,9 @@
 #define ACTIVE_VIDEO_LINE_TIME (SCANLINE_TIME_NS - (HSYNC_GAP_NS + FRONT_PORCH_GAP_NS + BACK_PORCH_GAP_NS))
 
 // SSI module frequency
-#if defined(ASPECT_16_9)
+#if (ASPECT_RATIO == ASPECT_RATIO_16_9)
 #define TV_SSI_FREQ (7272727ul)
-#elif defined(ASPECT_4_3)
+#elif (ASPECT_RATIO == ASPECT_RATIO_4_3)
 #define TV_SSI_FREQ (6153846ul)
 #endif
 
@@ -100,5 +81,15 @@
 // Next multiple of 8 of horizontal resolution
 #define HORIZ_RESOLUTION_NMO_8 ((HORIZ_RESOLUTION%8)?((HORIZ_RESOLUTION&~(0x7))+8):(HORIZ_RESOLUTION))
 
-//#endif /* TVOUT_CONSTANTS_H_ */
+#define FB_WIDTH (HORIZ_RESOLUTION_NMO_8)
+#define FB_HEIGHT (NUM_VIDEO_LINES - FB_LINE_OFFSET)
+
+#elif (PLATFORM & PLATFORM_ARDUINO)
+
+#define FB_WIDTH 128
+#define FB_HEIGHT 96
+
+#endif
+
+#endif /* TVOUT_CONSTANTS_H_ */
 
