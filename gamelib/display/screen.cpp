@@ -457,7 +457,7 @@ void Screen::text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode)
     }
 }
 
-void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum), Bitmap_mode_t mode)
+void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect, modDestRect;
 
@@ -486,7 +486,7 @@ void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2
         uint8_t idx;
         if(idx = font.char_mapping(c))
         {
-            Vector2d& pos = posmod(cnum);
+            Point_t& pos = posmod(cnum);
 
             modDestRect.x = destRect.x + pos.x;
             modDestRect.y = destRect.y + pos.y;

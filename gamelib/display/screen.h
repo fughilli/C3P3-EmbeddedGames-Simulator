@@ -195,7 +195,7 @@ public:
 
 	// Text
 	void text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode);
-	void text_plus_offset(Font_t& font, Point_t pt, const char* str, Vector2d& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
+	void text_plus_offset(Font_t& font, Point_t pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
 
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);
