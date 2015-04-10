@@ -52,24 +52,6 @@ struct Bitmap_t
 	}
 };
 
-struct Rect_t
-{
-    screen_coord_t x, y, w, h;
-
-    Rect_t()
-    {
-        x = y = w = h = 0;
-    }
-
-    Rect_t(screen_coord_t _x, screen_coord_t _y, screen_coord_t _w, screen_coord_t _h)
-    {
-        x = _x;
-        y = _y;
-        w = _w;
-        h = _h;
-    }
-};
-
 struct Point_t
 {
 	screen_coord_t x, y;
@@ -116,6 +98,51 @@ struct Point_t
     }
 
     const static Point_t zero;
+};
+
+struct Rect_t
+{
+    screen_coord_t x, y, w, h;
+
+    Rect_t()
+    {
+        x = y = w = h = 0;
+    }
+
+    Rect_t(screen_coord_t _x, screen_coord_t _y, screen_coord_t _w, screen_coord_t _h)
+    {
+        x = _x;
+        y = _y;
+        w = _w;
+        h = _h;
+    }
+
+    Rect_t operator+(const Point_t& other)
+    {
+        return Rect_t(other.x + x, other.y + y, w, h);
+    }
+
+    Point_t upperLeft()
+    {
+        return Point_t(x,y);
+    }
+    Point_t lowerLeft()
+    {
+        return Point_t(x,y+h);
+    }
+    Point_t upperRight()
+    {
+        return Point_t(x+w,y);
+    }
+    Point_t lowerRight()
+    {
+        return Point_t(x+w,y+h);
+    }
+
+    Point_t center()
+    {
+        return Point_t(x+w/2,y+h/2);
+    }
 };
 
 struct Font_t
