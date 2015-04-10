@@ -5,6 +5,8 @@
  *      Author: Kevin
  */
 
+ #ifdef __cplusplus
+
 #include "tvout.h"
 #include "tvout_constants.h"
 #include "../compat/SDL_DisplayInterface.h"
@@ -127,3 +129,4 @@ void Timer0IntHandler(void)
 
 }
 
+#endif

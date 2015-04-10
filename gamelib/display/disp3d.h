@@ -1,6 +1,8 @@
 #ifndef _DISP_3D_H_
 #define _DISP_3D_H_
 
+#ifdef __cplusplus
+
 #include "../utils/VectorLib/Matrix.h"
 #include "../utils/VectorLib/Vector.h"
 #include "stdint.h"
@@ -25,6 +27,8 @@ public:
                                  const uint16_t* tlist, uint16_t tlistlen,
                                  const Matrix4x4& projMat);
 };
+
+#endif
 
 #endif // _DISP_3D_H_
 

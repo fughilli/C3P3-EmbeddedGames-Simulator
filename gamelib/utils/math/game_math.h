@@ -1,6 +1,8 @@
 #ifndef _GAME_MATH_H_
 #define _GAME_MATH_H_
 
+#ifdef __cplusplus
+
 namespace GameMath
 {
 
@@ -14,6 +16,8 @@ void clamp(T& val, T minval, T maxval)
 }
 
 }
+
+#endif
 
 #endif // _GAME_MATH_H_
 

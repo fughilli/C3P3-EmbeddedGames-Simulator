@@ -8,6 +8,8 @@
 #ifndef SCREEN_H_
 #define SCREEN_H_
 
+#ifdef __cplusplus
+
 #include <stdint.h>
 #include <stdbool.h>
 #include "../utils/VectorLib/Vector.h"
@@ -220,5 +222,7 @@ public:
 };
 
 extern Screen screen;
+
+#endif
 
 #endif /* SCREEN_H_ */

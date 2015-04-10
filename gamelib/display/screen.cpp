@@ -5,6 +5,8 @@
  *      Author: Kevin
  */
 
+#ifdef __cplusplus
+
 #include "screen.h"
 #include "tvout.h"
 #include <algorithm>
@@ -1262,3 +1264,5 @@ void Screen::triangle(const Point_t* _p1, const Point_t* _p2, const Point_t* _p3
 }
 
 Screen screen(&TVOut_Framebuffer, FB_WIDTH, FB_HEIGHT);
+
+#endif

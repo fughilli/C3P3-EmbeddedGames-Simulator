@@ -1,3 +1,5 @@
+#ifdef __cplusplus
+
 #include "disp3d.h"
 #include "screen.h"
 
@@ -151,3 +153,5 @@ bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const
 
     return true;
 }
+
+#endif

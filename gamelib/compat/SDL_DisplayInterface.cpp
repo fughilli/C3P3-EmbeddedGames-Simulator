@@ -1,6 +1,7 @@
+#ifdef __cplusplus
+
 #include "SDL_DisplayInterface.h"
 #include "SDL2/SDL.h"
-
 
 static uint32_t G3D_ColorTo32BitColor(const G3D_Color& color)
 {
@@ -111,3 +112,5 @@ void SDL_DisplayInterface::fillFromBitmap(uint8_t* bmp)
         }
     }
 }
+
+#endif
