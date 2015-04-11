@@ -121,6 +121,20 @@ struct Rect_t
     {
         return Rect_t(other.x + x, other.y + y, w, h);
     }
+    Rect_t operator-(const Point_t& other)
+    {
+        return Rect_t(other.x - x, other.y - y, w, h);
+    }
+    void operator+=(const Point_t& other)
+    {
+        x += other.x;
+        y += other.y;
+    }
+    void operator-=(const Point_t& other)
+    {
+        x -= other.x;
+        y -= other.y;
+    }
 
     Point_t upperLeft()
     {
