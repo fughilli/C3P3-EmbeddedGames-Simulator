@@ -41,6 +41,10 @@
 		</Linker>
 		<Unit filename="bitmaps/arrow.cpp" />
 		<Unit filename="bitmaps/arrow.h" />
+		<Unit filename="bitmaps/font5x7.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/font5x7.h" />
 		<Unit filename="bitmaps/gunsprite_detail.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -69,8 +73,6 @@
 		<Unit filename="game/game.h" />
 		<Unit filename="gamelib/compat/SDL_DisplayInterface.cpp" />
 		<Unit filename="gamelib/compat/SDL_DisplayInterface.h" />
-		<Unit filename="gamelib/compat/compat_main.cpp" />
-		<Unit filename="gamelib/compat/compat_main.h" />
 		<Unit filename="gamelib/display/disp3d.cpp" />
 		<Unit filename="gamelib/display/disp3d.h" />
 		<Unit filename="gamelib/display/screen.cpp" />
