@@ -14,6 +14,7 @@
 #include <stdbool.h>
 #include "../utils/VectorLib/Vector.h"
 
+
 typedef int32_t screen_coord_t;
 
 enum Color_t
@@ -166,6 +167,8 @@ struct Font_t
     uint8_t char_height;
     uint8_t char_stride;
     uint8_t char_kerning;
+    uint8_t char_vstride;
+    uint8_t char_hstride;
     uint8_t (*char_mapping)(uint8_t);
 
     Font_t(Bitmap_t* fb, uint8_t w, uint8_t h, uint8_t s, uint8_t k, uint8_t (*m)(uint8_t))
@@ -176,8 +179,64 @@ struct Font_t
         char_stride = s;
         char_kerning = k;
         char_mapping = m;
+        char_vstride = (4 * char_height) / 3;
+        char_hstride = char_width + char_kerning;
+    }
+
+    static void textSize(const char* str, uint16_t *w, uint16_t *h)
+    {
+        if(!w || !h || !str)
+            return;
+
+        (*w) = 0;
+        (*h) = 0;
+
+        uint16_t maxw = 0;
+        char nextChar;
+        while(1)
+        {
+            nextChar = *str;
+
+            if(nextChar == '\n' || nextChar == '\0')
+            {
+                if(maxw > (*w))
+                    (*w) = maxw;
+                maxw = 0;
+                (*h)++;
+
+                if(nextChar == '\0')
+                {
+                    break;
+                }
+            }
+            else
+                maxw++;
+            str++;
+        }
+    }
+
+    void textSizePixels(const char* str, uint16_t *w, uint16_t *h) const
+    {
+        if(!w || !h || !str)
+            return;
+
+        Font_t::textSize(str, w, h);
+
+        if(*w)
+        {
+            (*w) *= char_hstride;
+            (*w) -= char_kerning;
+        }
+
+        if(*h)
+        {
+            (*h) *= char_vstride;
+            (*h) -= (char_vstride - char_height);
+        }
     }
 };
+
+class BoxSprite_t;
 
 class Screen {
 protected:
@@ -235,8 +294,9 @@ public:
 	void bitmap_adj(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * dest, Bitmap_mode_t mode);
 
 	// Text
-	void text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode);
-	void text_plus_offset(Font_t& font, Point_t pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
+	void text(const Font_t& font, const Point_t& pt, const char* str, Bitmap_mode_t mode);
+	void text_plus_offset(const Font_t& font, const Point_t& pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode);
+	void textBox(const char* str, const Font_t& font, const BoxSprite_t& border, const Point_t& pos, uint8_t margin, Bitmap_mode_t bordermode, Bitmap_mode_t textmode);
 
     // Transform blits
 	void bitmap_scaled_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect_t * destRect, Bitmap_mode_t mode);

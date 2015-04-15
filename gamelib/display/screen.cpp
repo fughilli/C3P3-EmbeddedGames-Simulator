@@ -425,7 +425,7 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect
     }
 }
 
-void Screen::text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode)
+void Screen::text(const Font_t& font, const Point_t& pt, const char* str, Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect;
 
@@ -441,7 +441,7 @@ void Screen::text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode)
     {
         if(c == '\n')
         {
-            destRect.y += (font.char_height * 4 / 3);
+            destRect.y += font.char_vstride;
             destRect.x = pt.x;
             str++;
             continue;
@@ -457,7 +457,7 @@ void Screen::text(Font_t& font, Point_t pt, const char* str, Bitmap_mode_t mode)
     }
 }
 
-void Screen::text_plus_offset(Font_t& font, Point_t pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode)
+void Screen::text_plus_offset(const Font_t& font, const Point_t& pt, const char* str, Point_t& (*posmod)(uint32_t charnum), Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect, modDestRect;
 
