@@ -1,0 +1,16 @@
+#ifndef _GAME_SETTINGS_H_
+#define _GAME_SETTINGS_H_
+
+#define MAX_SNAKE_LEN (512)
+#define FOOD_BONUS_LEN (1)
+#define FOOD_TAKEN_TO_SPEEDUP (10)
+#define MAX_HIGHSCORES (10)
+#define DANK_MODE (1)
+#define SCORE_PER_FOOD (1000)
+#define SCORE_PER_FRAME (-1)
+#define DEFAULT_SNAKE_SPEED_DELAY (10)
+#define INITIAL_SNAKE_LEN (3)
+
+#endif // _GAME_SETTINGS_H_
+
+
