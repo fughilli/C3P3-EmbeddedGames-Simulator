@@ -23,9 +23,16 @@ typedef union {
 		uint8_t down :1;
 		uint8_t a :1;
 		uint8_t :2;
+		uint8_t p_b :1;
+		uint8_t p_left :1;
+		uint8_t p_up :1;
+		uint8_t p_right :1;
+		uint8_t p_down :1;
+		uint8_t p_a :1;
+		uint8_t :2;
 	} buttons;
 
-	uint8_t raw;
+	uint16_t raw;
 } Remote_buttons_t;
 
 extern Remote_buttons_t sim_hooked_buttons;

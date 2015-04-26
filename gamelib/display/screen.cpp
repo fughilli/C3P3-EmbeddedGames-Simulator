@@ -425,7 +425,153 @@ void Screen::bitmap_nbx(const Bitmap_t * bmp, const Rect_t * srcRect, const Rect
     }
 }
 
+// Advances the ptr pointed to by st to the next line in str
+// and sets len accordingly; if st hits end of line, len = 0
+// and this function returns false, otherwise returns true
+static bool nextline(const char* str, char const** st, uint32_t* len)
+{
+    const char* idx = (*st);
+    (*len) = 0;
+    // While the current character is not a newline, nor end of line
+    while((*idx) != '\n' && (*idx))
+    {
+        // Increment the character index
+        idx++;
+    }
+    // We have hit either newline or end of line
+
+    // If we hit end of line, return false
+    if(!(*idx))
+    {
+        return false;
+    }
+
+    // Advance past the newline
+    idx++;
+    (*st) = idx;
+
+    // If we hit a newline, find the end
+    while(idx[(*len)] != '\n' && idx[(*len)])
+    {
+        (*len)++;
+    }
+    return true;
+}
+
+static uint32_t linelen(const char* str)
+{
+    uint32_t ret = 0;
+    while(str[ret] != '\n' && str[ret])
+    {
+        ret++;
+    }
+    return ret;
+}
+
+void Screen::textOption(const Font_t& font,
+                const Point_t& pt,
+                const char* str,
+                Font_anchor_pos_t fapos,
+                Font_justification_t fjust,
+                Bitmap_mode_t mode)
+{
+    if(*str == 0)
+        return;
+
+    uint16_t maxw, maxh;
+    int16_t linewidth, lineheight;
+    font.textSizePixels(str, &maxw, &maxh);
+
+    Point_t drawpt = pt;
+
+    switch(fapos)
+    {
+    case FAP_TOP_LEFT:
+    {
+
+    }
+    break;
+    case FAP_TOP_RIGHT:
+    {
+        drawpt -= Point_t(maxw, 0);
+    }
+    break;
+    case FAP_TOP_CENTER:
+    {
+        drawpt -= Point_t(maxw/2, 0);
+    }
+    break;
+    case FAP_LEFT_CENTER:
+    {
+        drawpt -= Point_t(0, maxh/2);
+    }
+    break;
+    case FAP_RIGHT_CENTER:
+    {
+        drawpt -= Point_t(maxw, maxh/2);
+    }
+    break;
+    case FAP_BOTTOM_LEFT:
+    {
+        drawpt -= Point_t(0, maxh);
+    }
+    break;
+    case FAP_BOTTOM_RIGHT:
+    {
+        drawpt -= Point_t(maxw, maxh);
+    }
+    break;
+    case FAP_BOTTOM_CENTER:
+    {
+        drawpt -= Point_t(maxw/2, maxh);
+    }
+    break;
+    case FAP_CENTER:
+    {
+        drawpt -= Point_t(maxw/2, maxh/2);
+    }
+    break;
+    }
+
+    // If the text is left justified, just draw it
+    if(fjust == FJ_LEFT)
+    {
+        screen.text(font, drawpt, str, mode);
+        return;
+    }
+    // If the text is right justified or center justified,
+    // shift the drawpt right
+    if(fjust == FJ_RIGHT || fjust == FJ_CENTER)
+    {
+        if(fjust == FJ_RIGHT)
+            drawpt += Point_t(maxw, 0);
+        if(fjust == FJ_CENTER)
+            drawpt += Point_t(maxw/2, 0);
+
+        const char* lstart = str;
+        uint32_t len = linelen(str);
+        lineheight = 0;
+
+        do
+        {
+            linewidth = (len * font.char_hstride) - font.char_kerning;
+            if(fjust == FJ_RIGHT)
+                screen.textlen(font, drawpt + Point_t(-linewidth, lineheight), lstart, len, mode);
+            if(fjust == FJ_CENTER)
+                screen.textlen(font, drawpt + Point_t(-(linewidth/2), lineheight), lstart, len, mode);
+            lineheight += font.char_vstride;
+        }
+        while(nextline(str, &lstart, &len));
+        return;
+    }
+}
+
 void Screen::text(const Font_t& font, const Point_t& pt, const char* str, Bitmap_mode_t mode)
+{
+    textlen(font, pt, str, 0xFFFFFFFF, mode);
+}
+
+void Screen::textlen(const Font_t& font, const Point_t& pt, const char* str, uint32_t strlen, Bitmap_mode_t mode)
 {
     Rect_t srcRect, destRect;
 
@@ -437,7 +583,7 @@ void Screen::text(const Font_t& font, const Point_t& pt, const char* str, Bitmap
     destRect.x = pt.x;
 
     char c;
-    while(c = *str)
+    while((c = *str) && (strlen--))
     {
         if(c == '\n')
         {

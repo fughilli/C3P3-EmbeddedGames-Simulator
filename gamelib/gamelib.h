@@ -13,6 +13,7 @@
 #include "input/remote.h"
 
 #include "utils/math/game_math.h"
+#include "utils/PWMTimer.h"
 
 #endif /* GAMELIB_H_ */
 

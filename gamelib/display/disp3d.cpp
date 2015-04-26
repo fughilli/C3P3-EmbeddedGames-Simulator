@@ -145,8 +145,8 @@ bool Display3D::drawVertexBufferI(void* workspace, const uint16_t wspclen, const
         dx1 = a.x - b.x;
         dx2 = c.x - b.x;
 
-//        if((dx1*dy2 - dy1*dx2) < 0)
-//            continue;
+        if((dx1*dy2 - dy1*dx2) < 0)
+            continue;
 
         screen.triangle(&a, &b, &c, WHITE, NONE);
     }
