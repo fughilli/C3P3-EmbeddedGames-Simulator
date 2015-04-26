@@ -41,6 +41,14 @@
 		</Linker>
 		<Unit filename="bitmaps/arrow.cpp" />
 		<Unit filename="bitmaps/arrow.h" />
+		<Unit filename="bitmaps/border_bubble.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/border_bubble.h" />
+		<Unit filename="bitmaps/border_fancy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="bitmaps/border_fancy.h" />
 		<Unit filename="bitmaps/font5x7.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -80,11 +88,14 @@
 		<Unit filename="gamelib/display/tvout.cpp" />
 		<Unit filename="gamelib/display/tvout.h" />
 		<Unit filename="gamelib/display/tvout_constants.h" />
+		<Unit filename="gamelib/fancygraphics/boxsprite.h" />
+		<Unit filename="gamelib/fancygraphics/textbox.cpp" />
 		<Unit filename="gamelib/gamelib.h" />
 		<Unit filename="gamelib/input/remote.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="gamelib/input/remote.h" />
+		<Unit filename="gamelib/utils/PWMTimer.h" />
 		<Unit filename="gamelib/utils/VectorLib/Matrix.cpp" />
 		<Unit filename="gamelib/utils/VectorLib/Matrix.h" />
 		<Unit filename="gamelib/utils/VectorLib/Quaternion.cpp" />
