@@ -69,15 +69,19 @@ int main(int argc, char* argv[])
             }
         }
 
-        Game_loop();
+        static int qua = 0;
+        if (++qua == 5) {
+            qua = 0;
+            screen.clear(BLACK);
+            Game_loop();
+        }
 
         compat_disp_interface->fillFromBitmap(TVOut_Framebuffer);
         compat_disp_interface->flip();
 
-        compat_disp_interface->fillFromBitmap(TVOut_Framebuffer);
-        compat_disp_interface->flip();
+        //compat_disp_interface->fillFromBitmap(TVOut_Framebuffer);
+        //compat_disp_interface->flip();
 
-        screen.clear(BLACK);
     }
 
     delete compat_disp_interface;
