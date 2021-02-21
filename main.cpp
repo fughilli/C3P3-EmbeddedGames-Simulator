@@ -1,9 +1,7 @@
 #include <SDL2/SDL.h>
 #include "gamelib/compat/SDL_DisplayInterface.h"
 #include "gamelib/display/screen.h"
-#include "bitmaps/hellojustin.h"
 #include "gamelib/input/remote.h"
-#include "bitmaps/littleman_fixed.h"
 #include "gamelib/compat/compat_main.h"
 #include "gamelib/display/tvout.h"
 #include "game/game.h"
