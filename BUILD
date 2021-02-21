@@ -5,13 +5,15 @@ cc_binary(
     srcs = ["main.cpp"],
     linkopts = ["-lSDL2"],
     deps = [
-        "//game",
+        ":control_message_cc_proto",
         "//gamelib",
         "//gamelib/compat:compat_main",
         "//gamelib/compat:sdl_display_interface",
         "//gamelib/display:screen",
         "//gamelib/display:tvout",
         "//gamelib/input:remote",
+        "//utils:udp_server",
+        "//bitmaps:font5x7",
     ],
 )
 

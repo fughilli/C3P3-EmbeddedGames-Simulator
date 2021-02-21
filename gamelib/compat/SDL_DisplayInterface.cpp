@@ -1,5 +1,3 @@
-#ifdef __cplusplus
-
 #include "SDL_DisplayInterface.h"
 
 #include "SDL2/SDL.h"
@@ -109,5 +107,3 @@ void SDL_DisplayInterface::fillFromBitmap(uint8_t* bmp) {
     }
   }
 }
-
-#endif
