@@ -33,3 +33,16 @@ cc_library(
         "//gamelib/utils/VectorLib:vectorlib",
     ],
 )
+
+cc_library(
+    name = "selector_widget",
+    hdrs = ["selector_widget.h"],
+    deps = [":screen", ":widget_util"],
+)
+
+cc_library(
+    name = "widget_util",
+    hdrs = ["widget_util.h"],
+    srcs = ["widget_util.cc"],
+    deps = [":screen"],
+)

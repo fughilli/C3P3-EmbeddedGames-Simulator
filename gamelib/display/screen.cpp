@@ -740,11 +740,11 @@ void Screen::box_nbx(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2,
       }
     }
   }
-  if (fcolor != NONE) {
+  if ((fcolor != NONE) && (x2 - x1 > 1)) {
     ++y1;
     while (y1 < y2) {
       // Increment first, so as to avoid double-drawing the top horizontal.
-      hline_nbx(y1, x1, x2, fcolor);
+      hline_nbx(y1, x1 + 1, x2 - 1, fcolor);
       ++y1;
     }
   }
