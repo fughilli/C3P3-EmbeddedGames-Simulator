@@ -58,7 +58,7 @@ class SelectorWidget {
         for (int i = 0; i < kNumOptions; ++i) {
           option_anchors_[i] = {
               max_label_width_ / 2 + (max_label_width_ - 1) * i +
-                  screen_->getWidth() - total_width_ - 4,
+                  screen_->getWidth() - total_width_,
               screen_->getHeight() - max_label_height_ / 2 - 1};
         }
       } break;
@@ -88,7 +88,7 @@ class SelectorWidget {
         screen_->box(&total_box, WHITE, NONE);
       } break;
       case FAP_BOTTOM_RIGHT: {
-        Rect_t total_box = {screen_->getWidth() - total_width_ - 4,
+        Rect_t total_box = {screen_->getWidth() - total_width_,
                             screen_->getHeight() - max_label_height_,
                             total_width_, max_label_height_};
         screen_->box(&total_box, WHITE, NONE);

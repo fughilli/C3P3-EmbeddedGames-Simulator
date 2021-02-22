@@ -14,11 +14,10 @@ Screen::Screen(uint8_t** _fbuf, screen_coord_t _w, screen_coord_t _h) {
   m_width = _w;
   m_height = _h;
 
-  if (m_width % 8) {
-    m_width = (((m_width / 8) + 1) * 8);
+  m_bytewidth = _w / 8;
+  if (_w % 8) {
+    ++m_bytewidth;
   }
-
-  m_bytewidth = m_width / 8;
 }
 
 void Screen::clear(Color_t color) {
@@ -552,9 +551,9 @@ void Screen::hline_nbx(screen_coord_t line, screen_coord_t x1,
     setPixel_nbx(x1, line, color);
   else {
     l_mask = 0xff >> (x1 & 7);
-    x1 = (x1 + m_width * line) / 8;
+    x1 = (x1 + (m_bytewidth * 8) * line) / 8;
     r_mask = ~(0xff >> ((x2 & 7) + 1));
-    x2 = (x2 + m_width * line) / 8;
+    x2 = (x2 + (m_bytewidth * 8) * line) / 8;
     if (x1 == x2) {
       l_mask = l_mask & r_mask;
       r_mask = 0;
@@ -708,20 +707,16 @@ void Screen::line_nbx(const Point_t* p1, const Point_t* p2, Color_t color,
 void Screen::box(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2,
                  screen_coord_t y2, Color_t color, Color_t fcolor) {
   if (x1 > x2) {
-    screen_coord_t temp = x1;
-    x1 = x2;
-    x2 = temp;
+    std::swap(x1, x2);
   }
 
-  if (x1 < 0 || x1 > m_width) return;
+  if (x1 < 0 || x1 >= m_width) return;
 
   if (y1 > y2) {
-    screen_coord_t temp = y1;
-    y1 = y2;
-    y2 = temp;
+    std::swap(y1, y2);
   }
 
-  if (y1 < 0 || y1 > m_height) return;
+  if (y1 < 0 || y1 >= m_height) return;
 
   box_nbx(x1, y1, x2, y2, color, fcolor);
 }
@@ -729,22 +724,28 @@ void Screen::box(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2,
 void Screen::box_nbx(screen_coord_t x1, screen_coord_t y1, screen_coord_t x2,
                      screen_coord_t y2, Color_t color, Color_t fcolor) {
   if (color != NONE) {
-    hline_nbx(y1, x1, x2, color);
-    if (y1 != y2) {
-      hline_nbx(y2, x1, x2, color);
+    if (x1 != x2) {
+      hline_nbx(y1, x1, x2, color);
+      if (y1 != y2) {
+        hline_nbx(y2, x1, x2, color);
+      }
     }
 
-    if (y2 - y1 > 2) {
-      vline_nbx(x1, y1 + 1, y2 - 1, color);
-      if (x1 != x2) {
+    if (y2 - y1 > 1) {
+      if (x1 == x2) {
+        vline_nbx(x1, y1, y2, color);
+      } else {
+        vline_nbx(x1, y1 + 1, y2 - 1, color);
         vline_nbx(x2, y1 + 1, y2 - 1, color);
       }
     }
   }
   if (fcolor != NONE) {
-    while (y1 <= y2) {
+    ++y1;
+    while (y1 < y2) {
+      // Increment first, so as to avoid double-drawing the top horizontal.
       hline_nbx(y1, x1, x2, fcolor);
-      y1++;
+      ++y1;
     }
   }
 }
