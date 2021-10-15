@@ -22,10 +22,17 @@ void Console::ProcessControl(const Control& control) {
   if (control.has_value() && value_to_adjust_ != nullptr) {
     *value_to_adjust_ = control.value();
   }
+  if (control.has_estop()) {
+    modal_widget_.Set(0, control.estop());
+  }
+  if (control.has_feedhold()) {
+    modal_widget_.Set(1, control.feedhold());
+  }
 }
 
 void Console::Render() {
   axis_widget_.Render();
   multiplier_widget_.Render();
+  modal_widget_.Render();
   dro_widget_.Render();
 }

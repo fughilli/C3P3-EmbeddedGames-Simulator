@@ -37,12 +37,24 @@ cc_library(
 cc_library(
     name = "selector_widget",
     hdrs = ["selector_widget.h"],
-    deps = [":screen", ":widget_util"],
+    deps = [
+        ":screen",
+        ":widget_util",
+    ],
+)
+
+cc_library(
+    name = "modal_widget",
+    hdrs = ["modal_widget.h"],
+    deps = [
+        ":screen",
+        ":widget_util",
+    ],
 )
 
 cc_library(
     name = "widget_util",
-    hdrs = ["widget_util.h"],
     srcs = ["widget_util.cc"],
+    hdrs = ["widget_util.h"],
     deps = [":screen"],
 )

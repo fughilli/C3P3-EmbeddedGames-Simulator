@@ -3,6 +3,7 @@
 
 #include "control_message.pb.h"
 #include "dro_widget.h"
+#include "gamelib/display/modal_widget.h"
 #include "gamelib/display/screen.h"
 #include "gamelib/display/selector_widget.h"
 
@@ -13,6 +14,7 @@ class Console {
         font_(font),
         axis_widget_(screen_, font_, FAP_BOTTOM_LEFT, kAxisLabels),
         multiplier_widget_(screen_, font_, FAP_BOTTOM_RIGHT, kMultiplierLabels),
+        modal_widget_(screen_, font_, FAP_BOTTOM_CENTER, kModalLabels),
         dro_widget_(screen_, font_, FAP_TOP_LEFT, kDroLabels) {}
 
   void ProcessControl(const Control& control);
@@ -29,6 +31,9 @@ class Console {
 
   const char* kMultiplierLabels[3] = {"X1", "X10", "X100"};
   SelectorWidget<3> multiplier_widget_;
+
+  const char* kModalLabels[2] = {"E", "F"};
+  ModalWidget<2> modal_widget_;
 
   const char* kDroLabels[4] = {"X", "Y", "Z", "S"};
   DroWidget<4> dro_widget_;

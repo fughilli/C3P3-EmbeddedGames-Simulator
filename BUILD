@@ -41,6 +41,7 @@ cc_library(
         ":dro_widget",
         "//gamelib/display:screen",
         "//gamelib/display:selector_widget",
+        "//gamelib/display:modal_widget",
     ],
 )
 

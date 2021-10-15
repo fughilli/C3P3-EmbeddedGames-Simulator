@@ -42,18 +42,18 @@ class SelectorWidget {
     }
   }
 
-  void SetOption(int axis) {
-    if (axis >= kNumOptions) {
-      axis_ = kNumOptions - 1;
+  void SetOption(int option) {
+    if (option >= kNumOptions) {
+      option_ = kNumOptions - 1;
       return;
     }
 
-    if (axis < 0) {
-      axis_ = 0;
+    if (option < 0) {
+      option_ = 0;
       return;
     }
 
-    axis_ = axis;
+    option_ = option;
   }
 
   void Render() {
@@ -76,7 +76,7 @@ class SelectorWidget {
     for (int i = 0; i < kNumOptions; ++i) {
       screen_->textOption(*font_, option_anchors_[i], option_labels_[i],
                           FAP_CENTER, FJ_LEFT, MODE_OVERWRITE_INVERT);
-      if (i == axis_) {
+      if (i == option_) {
         Rect_t highlight_box = {0, 0, max_label_width_, max_label_height_};
         highlight_box.centerOn(option_anchors_[i]);
         screen_->box(&highlight_box, INVERT, INVERT);
@@ -88,7 +88,7 @@ class SelectorWidget {
   int max_label_width_ = 0;
   int max_label_height_ = 0;
 
-  int axis_ = 0;
+  int option_ = 0;
 
   const char** option_labels_;
   Point_t option_anchors_[kNumOptions] = {};
