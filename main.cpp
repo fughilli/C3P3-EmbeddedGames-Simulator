@@ -9,7 +9,8 @@
 #include "gamelib/compat/compat_main.h"
 #include "gamelib/display/screen.h"
 #include "gamelib/display/tvout.h"
-#include "utils/udp_server.h"
+#include "google/protobuf/util/message_differencer.h"
+#include "utils/udp_client.h"
 
 Bitmap_t font5x7_bitmap(font5x7, 256 * 5, 7);
 uint8_t mapping(uint8_t char_code) { return char_code; }
@@ -24,15 +25,20 @@ int main(int argc, char* argv[]) {
       SDL_DisplayInterface::createWindow(FB_WIDTH, FB_HEIGHT, window, 2);
   SDL_SetHintWithPriority(SDL_HINT_RENDER_VSYNC, "1", SDL_HINT_OVERRIDE);
 
-  utils::UdpServer server(5533);
-  server.Start();
+  utils::UdpClient client("127.0.0.1", 5533);
+  if (!client.Start()) {
+    std::cout << "Failed to start client" << std::endl;
+  }
   std::vector<uint8_t> buffer;
   Console console(&screen, &font5x7_font);
 
-  Control control;
+  Control old_control, control;
   control.set_value(0);
   control.set_axis(Control::AXIS_NONE);
   control.set_multiplier(Control::MULT_X1);
+
+  bool estopped = false;
+  bool feedholded = false;
 
   while (true) {
     SDL_PumpEvents();
@@ -73,10 +79,10 @@ int main(int argc, char* argv[]) {
             control.set_value(control.value() + 100);
             break;
           case SDL_SCANCODE_T:
-            control.set_estop(true);
+            estopped = !estopped;
             break;
           case SDL_SCANCODE_Y:
-            control.set_feedhold(true);
+            feedholded = !feedholded;
             break;
           default:
             break;
@@ -93,24 +99,54 @@ int main(int argc, char* argv[]) {
           case SDL_SCANCODE_R:
             break;
           case SDL_SCANCODE_T:
-            control.set_estop(false);
             break;
           case SDL_SCANCODE_Y:
-            control.set_feedhold(false);
             break;
           default:
             break;
         }
       }
-      console.ProcessControl(control);
+
+      if (estopped) {
+        control.set_estop(true);
+      } else {
+        if (control.estop()) {
+          control.set_estop(false);
+        } else {
+          control.clear_estop();
+        }
+      }
+      if (feedholded) {
+        control.set_feedhold(true);
+      } else {
+        if (control.feedhold()) {
+          control.set_feedhold(false);
+        } else {
+          control.clear_feedhold();
+        }
+      }
+
+      if (!google::protobuf::util::MessageDifferencer::Equals(control,
+                                                              old_control)) {
+        console.ProcessControl(control);
+        std::string proto_string;
+        control.SerializeToString(&proto_string);
+        if (!client.Write(std::vector<uint8_t>(proto_string.begin(),
+                                               proto_string.end()))) {
+          std::cout << "Failed to write to server" << std::endl;
+        } else {
+          std::cout << "Wrote: " << control.ShortDebugString() << std::endl;
+        }
+        old_control = control;
+      }
     }
     screen.clear(BLACK);
 
-    if (server.Read(&buffer)) {
-      Control control;
-      control.ParseFromString(std::string(buffer.begin(), buffer.end()));
-      std::cout << control.ShortDebugString() << std::endl;
-      console.ProcessControl(control);
+    if (client.Read(&buffer)) {
+      DroState dro_state;
+      dro_state.ParseFromString(std::string(buffer.begin(), buffer.end()));
+      std::cout << dro_state.ShortDebugString() << std::endl;
+      console.ProcessDroState(dro_state);
     }
 
     console.Render();

@@ -11,3 +11,9 @@ git_repository(
 load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
 
 protobuf_deps()
+
+git_repository(
+    name = "com_googletest",
+    branch = "master",
+    remote = "https://github.com/google/googletest",
+)

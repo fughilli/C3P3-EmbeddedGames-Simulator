@@ -26,3 +26,14 @@ message Control {
   optional bool feedhold = 6;
   optional bool estop = 7;
 }
+
+message DroState {
+  optional float pos_x = 1;
+  optional float pos_y = 2;
+  optional float pos_z = 3;
+  optional float pos_4 = 4;
+  optional float pos_5 = 5;
+  optional float pos_6 = 6;
+
+  optional string dialog = 7;
+}

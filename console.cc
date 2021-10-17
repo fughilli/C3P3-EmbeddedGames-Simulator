@@ -30,6 +30,18 @@ void Console::ProcessControl(const Control& control) {
   }
 }
 
+void Console::ProcessDroState(const DroState& dro_state) {
+#define SET_POS(x, y) \
+  if (dro_state.has_pos_##x()) dro_widget_.SetPosition(y, dro_state.pos_##x());
+  SET_POS(x, 0);
+  SET_POS(y, 1);
+  SET_POS(z, 2);
+  SET_POS(4, 3);
+  SET_POS(5, 4);
+  SET_POS(6, 5);
+#undef SET_POS
+}
+
 void Console::Render() {
   axis_widget_.Render();
   multiplier_widget_.Render();

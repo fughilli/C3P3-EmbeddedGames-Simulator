@@ -13,7 +13,8 @@ cc_binary(
         "//gamelib/compat:sdl_display_interface",
         "//gamelib/display:screen",
         "//gamelib/display:tvout",
-        "//utils:udp_server",
+        "//utils:udp_client",
+        "@com_google_protobuf//:protobuf",
     ],
 )
 

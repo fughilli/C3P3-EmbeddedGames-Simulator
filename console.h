@@ -18,6 +18,7 @@ class Console {
         dro_widget_(screen_, font_, FAP_TOP_LEFT, kDroLabels) {}
 
   void ProcessControl(const Control& control);
+  void ProcessDroState(const DroState& dro_state);
   void Render();
 
  private:
