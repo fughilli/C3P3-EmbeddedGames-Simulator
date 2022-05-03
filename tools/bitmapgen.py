@@ -6,13 +6,13 @@ img = 0
 if(len(sys.argv) > 1):
     ifilename = sys.argv[1]
 else:
-    sys.stdout.write("Enter a file to convert to a bitmap: ")
+    sys.stdout.write("Enter a file to convert to a bitmap: \n")
     ifilename = sys.stdin.readline().strip('\n\r')
     
 try:
     img = Image.open(ifilename)
 except:
-    print "Error opening file %s\n" % ifilename,
+    print("Error opening file %s\n" % ifilename)
     exit(1)
 
 # do image stuff
@@ -28,7 +28,7 @@ try:
     ohfile = open(ofnamenoext + '.h', 'w')
     ocfile = open(ofnamenoext + '.c', 'w')
 except:
-    print "Error opening output files\n"
+    print("Error opening output files\n")
 
 imgwidth = img.size[0]
 imgheight = img.size[1]

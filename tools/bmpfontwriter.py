@@ -14,7 +14,7 @@ ifilename = ''
 def prompt_for(msg, regexp):
     while(1):
         sys.stdout.write(msg)
-        trialline = sys.stdin.readline().translate(None, '\r\n')
+        trialline = sys.stdin.readline().translate({None: '\r\n'})
         r = re.compile(regexp)
         if(r.match(trialline) == None):
             sys.stderr.write("Incorrect format! Filename has to match " + "\'" + regexp + "\'\n")
@@ -47,7 +47,7 @@ if(option == 0):
                              "and dimensions must be nonzero.\n")
             continue
 
-        font_size = (inimage.size[0]/256, inimage.size[1])
+        font_size = (inimage.size[0]//256, inimage.size[1])
         
         break   
 
@@ -81,8 +81,8 @@ pygame.display.set_caption("Bitmap Font Writer v0.1")
 
 pixfield_ulhpos = (20,20)
 pixfield_cell_size = int(min((
-    (screen_size[0]/2 - pixfield_ulhpos[0]*2)/font_size[0],
-    (screen_size[1] - pixfield_ulhpos[1]*2)/font_size[1]
+    (screen_size[0]//2 - pixfield_ulhpos[0]*2)//font_size[0],
+    (screen_size[1] - pixfield_ulhpos[1]*2)//font_size[1]
     )))
 
 pixfield_size = font_size[:]
@@ -143,7 +143,7 @@ def pixfield_pos(cell_size, pos, grid_size, xy):
 
 def pixfield_pos_rl(cell_size, pos, grid_size, xyscreen):
     ulhc = pixfield_pos(cell_size, pos, grid_size, (0,0))
-    targpos = ((xyscreen[0]-ulhc[0])/cell_size, (xyscreen[1]-ulhc[1])/cell_size)
+    targpos = ((xyscreen[0]-ulhc[0])//cell_size, (xyscreen[1]-ulhc[1])//cell_size)
 
     if(targpos[0] < 0 or
        targpos[0] >= grid_size[0] or
@@ -283,19 +283,19 @@ def char_clear():
 
 draggingflag = False
 
-backbutton = ((screen_size[0]/2 + 20,
+backbutton = ((screen_size[0]//2 + 20,
                screen_size[1]-70,100,50),
               "back",
               char_back)
-nextbutton = ((screen_size[0]/2 + 20+120,
+nextbutton = ((screen_size[0]//2 + 20+120,
                screen_size[1]-70,100,50),
               "next",
               char_forward)
-donebutton = ((screen_size[0]/2 + 20+240,
+donebutton = ((screen_size[0]//2 + 20+240,
                screen_size[1]-70,100,50),
               "done",
               finish_up)
-clearbutton = ((screen_size[0]/2 + 20+240,
+clearbutton = ((screen_size[0]//2 + 20+240,
                screen_size[1]-140,100,50),
               "clear",
               char_clear)
@@ -416,7 +416,7 @@ while 1:
     # draw the letter currently being drawn
     textsurf = prompt_font.render("Character code %d:" % current_character, True, black)
 
-    destrect = screen.blit(textsurf, (screen_size[0]/2 + 20, 20))
+    destrect = screen.blit(textsurf, (screen_size[0]//2 + 20, 20))
 
     textsurf = big_prompt_font.render(get_disp_char(current_character), True, black)
 
